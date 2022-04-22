@@ -33,7 +33,7 @@ class DataPacket{
     int rightChildIndex;  // index of the right child = (2 * i) + 2
 
   public:
-    int domain_ID;  // software domain ID used to route DataPackets to an appropriated hash bucket.
+    string domain_ID;  // software domain ID used to route DataPackets to an appropriated hash bucket.
       // Default constructor
       DataPacket();
       // DataPacket deconstructor.
@@ -43,10 +43,9 @@ class DataPacket{
       // 
       void InsertNodeData(int nodePqIndex);
       // Getter function to access private data member: "data".
-      int GetPacketData();
+      string GetPacketData();
       // Getter function to access private data member: "packet_priority".
       int GetPacketPriority();
-
 };
 
 #endif // DATAPACKET_H__

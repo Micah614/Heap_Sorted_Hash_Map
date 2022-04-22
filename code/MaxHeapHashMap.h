@@ -19,7 +19,7 @@ using namespace std;
 struct MaxHeapPQ {  // Five MaxHeapPQ's are instantiated in every HashMap object
   MaxHeapPQ();  // PQ default constructor. Create one heap for each domain
   ~MaxHeapPQ();  // Destructor
-  int domain;  // the PQ domain identity
+  string domain;  // the PQ domain identity
   int nodeCount;  // keeps track of how populated a heap is.
   int currentIndex;  // first open index in the pointer array.
 
@@ -28,10 +28,10 @@ struct MaxHeapPQ {  // Five MaxHeapPQ's are instantiated in every HashMap object
   // IS THIS ARRAY DECLARED CORRECTLY??
   
   shared_ptr<DataPacket> pqTopPointer;  // always found at maxHeapArray[0]
-  shared_ptr<DataPacket> pqEmptyNode;  // DataPacket object containing an error message, returned by pqDomainLookUp when an accessed queue is empty. 
+  // shared_ptr<DataPacket> pqEmptyNode;  // DataPacket object containing an error message, returned by pqDomainLookUp when an accessed queue is empty. 
 
   //shared_ptr<DataPacket> InitPqDomain(int domain);  // Allocates max heap PQ, returns a shared pointer to the top node.
-  void InitPqDomain(int domain_ID);
+  void InitPqDomain(string domain_ID);
   void pqInsert(shared_ptr<MaxHeapPQ> pqDomain, shared_ptr<DataPacket> packet);  // inserts a DataPacket pointer object into appropriate max heap PQ
   void MaxHeapPercolateUp(int nodeIndex, shared_ptr<MaxHeapPQ> pqDomain);
 
@@ -45,7 +45,7 @@ typedef std::map<int, shared_ptr<MaxHeapPQ>> hashMap;  // typedef vector<shared_
 // UXUI_INTERFACE 1 || DATABASE_CONFIG 2 || LAUNCH_FILES 3 || REGISTRATION_MATERIALS 4 || EXECUTABLE_FILES 5
 struct HashMap {  // HashMap contains a five key map of domain ID's leading to shared pointer MaxHeapPQ top node pointers
   int packetCount; // DataPacket count accross all five domains
-  shared_ptr<hashMap> table;  // points to a map with key:value pairs domain_ID : shared_ptr<MaxHeapPQ>;
+  hashMap table;  // points to a map with key:value pairs domain_ID : shared_ptr<MaxHeapPQ>;
   HashMap();  // Default constructor for PerfectHashTable objects
   ~HashMap();  // Destructor for PerfectHashTable objects
 

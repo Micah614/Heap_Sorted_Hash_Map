@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include <stack>
+#include <cmath>
 
 using namespace std;
 
@@ -39,16 +40,30 @@ shared_ptr<DataPacket> DataPacket::InitDataPacket(string data, int packet_priori
 }
 
 // Return DataPacket private member var "data" (Getter function)
-int GetPacketData() {
-    // DO STUFF
+string DataPacket::GetPacketData() {
+    return data;
 }
 
-// Return DataPacket private member var "packet_priority" (Getter function)
-int GetPacketPriority() {
-    // DO STUFF
+// 
+int DataPacket::GetPacketPriority() {
+    return packet_priority;
 }
 
-
+// 
+void DataPacket::InsertNodeData(int nodePqIndex) {
+    int parentidx;
+    if(pqIndex == 0) {
+        parentidx = -1;  // top node has no parent. (default = -1)
+    }
+    else{
+        parentidx = floor((pqIndex-1)/2);  // calculate parent index
+    }
+    // update DataPacket private member variables.
+    parentIndex = parentidx;
+    pqIndex = nodePqIndex;
+    leftChildIndex = (2*pqIndex) + 1;
+    rightChildIndex = (2*pqIndex) + 2;
+}
 
 
 
