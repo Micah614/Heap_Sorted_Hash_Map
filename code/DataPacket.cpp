@@ -31,7 +31,6 @@ shared_ptr<DataPacket> DataPacket::InitDataPacket(string data, int packet_priori
     dataPacket->data = data;
     dataPacket->packet_priority = packet_priority;
     dataPacket->domain_ID = domain_ID;
-
     /*NOTE: The DataPacket member variables: pqIndex, parentIndex, leftChildIndex, and rightChildIndex 
     are all instantiated during insertion into a MaxHeapPQ data structure. see MaxHeapHashMap.cpp to see 
     how this happens. */
@@ -49,20 +48,20 @@ int DataPacket::GetPacketPriority() {
     return packet_priority;
 }
 
-// 
+// InsertNodeData assigns a DataPacket pqIndex value and populates it's other indices
 void DataPacket::InsertNodeData(int nodePqIndex) {
     int parentidx;
-    if(pqIndex == 0) {
+    if(nodePqIndex == 0) {  // the node's
         parentidx = -1;  // top node has no parent. (default = -1)
     }
     else{
-        parentidx = floor((pqIndex-1)/2);  // calculate parent index
+        parentidx = floor((nodePqIndex-1)/2);  // calculate parent index
     }
     // update DataPacket private member variables.
     parentIndex = parentidx;
     pqIndex = nodePqIndex;
-    leftChildIndex = (2*pqIndex) + 1;
-    rightChildIndex = (2*pqIndex) + 2;
+    leftChildIndex = (2*nodePqIndex) + 1;
+    rightChildIndex = (2*nodePqIndex) + 2;
 }
 
 
