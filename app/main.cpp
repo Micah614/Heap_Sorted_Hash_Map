@@ -156,11 +156,13 @@ cout << endl;
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP THREE: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
+vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED DATA
 
+// CREATE A WHILE-LOOP ISSUING DOMAIN ID REQUESTS TO inOrderHashMap AND shuffledHashMap
+    // STORE THE RETRIEVED POINTERS IN THE ASSIGNED VECTORS
 
-
-
-
+// VERIFY THAT THE CONTENTS OF EACH VECTOR ARE SORTED AND IDENTICAL
 
 
 
