@@ -22,33 +22,40 @@ struct MaxHeapPQ {  // Five MaxHeapPQ's are instantiated in every HashMap object
   string domain;  // the PQ domain identity
   int nodeCount;  // keeps track of how populated a heap is.
   int currentIndex;  // first open index in the pointer array.
-
   shared_ptr<DataPacket> pqMaxHeapArray[PQ_SIZE];  // variable size-allocated array of DataPacket shared pointers
-  
   shared_ptr<DataPacket> pqTopPointer;  // always found at maxHeapArray[0]
-  // shared_ptr<DataPacket> pqEmptyNode;  // DataPacket object containing an error message, returned by pqDomainLookUp when an accessed queue is empty. 
-  //shared_ptr<DataPacket> InitPqDomain(int domain);  // Allocates max heap PQ, returns a shared pointer to the top node.
+  // assignPqDomainAndInsert (STORAGE) HELPER FUNCTIONS
   void InitPqDomain(string domain_ID);
   void pqInsert(shared_ptr<DataPacket> packet);  // inserts a DataPacket pointer object into appropriate max heap PQ
   void MaxHeapPercolateUp(int nodeIndex, int packetPriority);
+
+
+
+// RESUME HERE
+  // (RETRIEVAL) HELPER FUNCTIONS FOR indexPqAndRetrieveData
   shared_ptr<DataPacket> pqDomainRemove(int domain_ID);  // removes and returns the highest priority element in the PQ with a matching hash bucket ID
   int pqDomainNodeCount(int domain_ID);  // retrieves the node_count for a selected PQ heap domain
   shared_ptr<DataPacket> pqDomainPeek(int domain_ID);
 };
 
 typedef std::map<int, shared_ptr<MaxHeapPQ>> hashMap;  // typedef vector<shared_ptr<MaxHeapPQ>> hashTable;
-
 // UXUI_INTERFACE 1 || DATABASE_CONFIG 2 || LAUNCH_FILES 3 || REGISTRATION_MATERIALS 4 || EXECUTABLE_FILES 5
+
 struct HashMap {  // HashMap contains a five key map of domain ID's leading to shared pointer MaxHeapPQ top node pointers
-  int packetCount; // DataPacket count accross all five domains
-  hashMap table;  // points to a map with key:value pairs domain_ID : shared_ptr<MaxHeapPQ>;
   HashMap();  // Default constructor for PerfectHashTable objects
   ~HashMap();  // Destructor for PerfectHashTable objects
+  int packetCount; // DataPacket count accross all five domains
+  hashMap table;  // points to a map with key:value pairs domain_ID : shared_ptr<MaxHeapPQ>;
+  // STORAGE FUNCTIONS
+  void initHashMap();  // initializes five (5) imbedded domain priority queues and a hashMap table routing object
+  void assignPqDomainAndInsert(shared_ptr<DataPacket> packet);  // accepts a DataPacket shared_ptr, then categorizes and inserts it by domain_ID
 
-  // InitHashMap initializes five (5) imbedded domain-labeled priority queues and returns a shared pointer to the hashMap typedef object
-  void initHashMap();
-  void assignPqDomainAndInsert(shared_ptr<DataPacket> packet);  // pointer will be passed to MaxHeapPQ::MaxHeapInsert() function
-  shared_ptr<MaxHeapPQ> pqDomainLookUp(int domain_ID);  // returns a PQ top node pointer when handed a domain_ID number
+
+
+// RESUME HERE
+  // RETRIEVAL FUNCTIONS
+  shared_ptr<DataPacket> indexPqAndRetrievePacket(int domain_ID);  // accepts an integer domain_ID, indexes MaxHeapPQ objects and extracts the top pointer
+
 };
 
 
