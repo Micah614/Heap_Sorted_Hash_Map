@@ -19,11 +19,13 @@ using namespace std;
 
 
 int main(){
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOAD FIRST DATA CONTAINERS $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    std::array<int,50> packetPriority;
-    std::array<string,50> packetData;
-    std::array<int,50> packetDomainID;
-// Populate the data arrays.
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP ONE: CREATE THE DATAPACKET OBJECTS AND LOAD SHARED POINTERS INTO STACKS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    std::array<int,50> packetPriority;  // ARRAY CONTAINING PACKET PRIORITIES
+    std::array<string,50> packetData;  // ARRAY CONTAINING PACKET DATA
+    std::array<int,50> packetDomainID;  // ARRAY CONTAINING PACKET DOMAIN_IDs
+
+// LOAD THE ARRAYS WITH NODE DATA
 for(int i=0; i<packetPriority.size(); ++i) {
     int j;
     if(i<14) {          // 0-13
@@ -51,17 +53,16 @@ for(int i=0; i<packetPriority.size(); ++i) {
     packetData[i] = to_string(i+1);
 }
 
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ CREATE DATA PACKET OBJECTS $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-// CREATE ORGANIZED DATA FEED
+// CREATE AN IN-ORDER DATA FEED STACK "inOrderStack"
 std::stack<shared_ptr<DataPacket>> inOrderStack;  // STACK TO HOLD IN-ORDER FEED
 for(int a=packetData.size()-1; a>-1; a--) {
     DataPacket curNode;
     shared_ptr<DataPacket> node = curNode.InitDataPacket(packetData[a], packetPriority[a], packetDomainID[a]);  // INITDATAPACKET
     inOrderStack.push(node);
 }
-// VERIFY IN-ORDER FEED
-std::stack<shared_ptr<DataPacket>> tempStack = inOrderStack;  // copy the stack to check it. 
-cout << "NOTE: In-order and shuffled object feeds contain the same DataPackets kept in a different order. " << endl << "verify in-order feed: ";
+// VERIFY THE IN-ORDER DATA FEED
+std::stack<shared_ptr<DataPacket>> tempStack = inOrderStack;  // MAKE A COPY OF THE STACK TO VERIFY ITS' CONTENTS
+cout << endl << "NOTE: In-order and shuffled object feeds contain the same DataPacket objects, arranged in a different order. " << endl << endl << "Verifying in-order feed: ";
 while(!tempStack.empty()) {
     shared_ptr<DataPacket> curPacket;
     curPacket = tempStack.top();
@@ -70,92 +71,90 @@ while(!tempStack.empty()) {
 }
 cout << endl << "  In-order stack size: " << inOrderStack.size() << endl;
 
-
-// CREATE SHUFFLED DATA FEED 
+// CREATE A SHUFFLED DATA FEED 
 std::vector<shared_ptr<DataPacket>> shuffleVec;
-std::stack<shared_ptr<DataPacket>> tempStack2 = inOrderStack;  // copy stack to load shuffleVec
-    // CREATE AND SHUFFLE THE VECTOR
+std::stack<shared_ptr<DataPacket>> tempStack2 = inOrderStack;  // COPY inOrderStack TO tempStack2
+// CREATE A VECTOR WITH THE DATAPACKET OBJECTS
 while(!tempStack2.empty()) {
     shared_ptr<DataPacket> curPacket;
     curPacket = tempStack2.top();
     tempStack2.pop();
     shuffleVec.push_back(curPacket);
-    std::random_shuffle(shuffleVec.begin(), shuffleVec.end());  // SHUFFLE shuffleVec
 }
-    // PUSH THE OBJECTS TO A SHUFFLED STACK
-std::stack<shared_ptr<DataPacket>> shuffledStack;  // STACK TO HOLD SHUFFLED FEED
+    std::random_shuffle(shuffleVec.begin(), shuffleVec.end());  // SHUFFLE THE VECTOR
+
+// PUSH THE SHUFFLED OBJECTS INTO A STACK
+std::stack<shared_ptr<DataPacket>> shuffledStack;  // DECLARE A STACK
 for(int c=0; c<shuffleVec.size(); ++c) {
     shared_ptr<DataPacket> curPacket;
     curPacket = shuffleVec.at(c);
     shuffledStack.push(curPacket);
 }
 shuffleVec.clear();
-    // VERIFY SHUFFLED FEED
-cout << endl << "verify shuffled feed: ";
-std::stack<shared_ptr<DataPacket>> tempStack3 = shuffledStack;  // copy shuffledStack to check it. 
+// VERIFY THAT THE FEED IS SHUFFLED
+cout << endl << "Verifying shuffled feed: ";
+std::stack<shared_ptr<DataPacket>> tempStack3 = shuffledStack;  // COPY SHUFFLEDSTACK TO VERIFY ITS' CONTENTS
 while(!tempStack3.empty()) {
     cout << (*tempStack3.top()).GetPacketData() << " ";
     tempStack3.pop();
 }
-cout << endl << "  Shuffled stack size: " << shuffledStack.size() << endl << endl << endl;
+cout << endl << "  Shuffled stack size: " << shuffledStack.size() << endl << endl;  // ENUMERATE THE NUMBER OF OBJECTS
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ PART TWO @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ CREATE HASHMAPS AND INSERT OBJECTS $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-cout << "~~~~~~" << endl << "Creating In-Order HashMap..." << endl;
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP TWO: CREATE TWO MAX-HEAP-HASHMAP OBJECTS AND INSERT DATAPACKETS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// CREATE IN-ORDER HASHMAP OBJECT
+cout << "~~~~~~" << endl << "Creating In-Order MaxHeapHashMap object..." << endl;
 HashMap inOrderHashMap;  // IN-ORDER HASHMAP OBJECT
-inOrderHashMap.initHashMap();
-
-if(inOrderHashMap.packetCount == 0) {
-    cout << "HashMap object exists... ";
+inOrderHashMap.initHashMap();  // INITIATE IN-ORDER HASHMAP OBJECT
+if(inOrderHashMap.packetCount == 0) {  // VERIFY THAT HASHMAP EXISTS
+    cout << "HashMap object created successfully... " << endl;
 }
-if((*inOrderHashMap.table[1]).domain == "uxui_interface") {
-    cout << "HashMap table and PQ substructures successfully initiated.";
+if((*inOrderHashMap.table[1]).domain == "uxui_interface") {  // VERIFY HASHMAP "table" MEMBER EXISTS AND HAS THE DESIRED ATTRIBUTES
+    cout << "HashMap table and PQ sub-structures successfully initiated." << endl;
 }
-
-while(!inOrderStack.empty()) {
+cout << "Routing DataPacket objects..." << endl;
+while(!inOrderStack.empty()) {  // INSERT THE DATA PACKETS FROM inOrderStack INTO inOrderHashMap USING assignPqDomainAndInsert MEMBER FUNCTION
     shared_ptr<DataPacket> curPacket;
     curPacket = inOrderStack.top();
     inOrderStack.pop();
-    inOrderHashMap.assignPqDomainAndInsert(curPacket);
+    inOrderHashMap.assignPqDomainAndInsert(curPacket);  // INSERT THE PACKET INTO inOrderHashMap
 }
-cout << endl << "  Routing DataPacket objects..." << endl;
 cout << endl;
-cout << inOrderHashMap.packetCount << " pre-sorted DataPackets were successfully routed and inserted in the HashMapPQ data structure:" << endl;
-
-for(int j=1; j<6; ++j) {
+cout << inOrderHashMap.packetCount << " pre-sorted DataPackets were successfully routed and inserted in the inOrderHashMap MaxHeapHashMap data structure." << endl;
+for(int j=1; j<6; ++j) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
     cout << "  " << (*inOrderHashMap.table[j]).nodeCount << " objects in the " << (*inOrderHashMap.table[j]).domain << " domain." << endl;
 }
-cout << endl << endl;
+cout << endl;
 
 
-
-cout << "~~~~~~" << endl << "Creating Shuffled HashMap..." << endl;
+// CREATE SHUFFLED HASHMAP OBJECT
+cout << "~~~~~~" << endl << "Creating Shuffled MaxHeapHashMap object..." << endl;
 HashMap shuffledHashMap;  // SHUFFLED HASHMAP OBJECT
-shuffledHashMap.initHashMap();
-
-if(shuffledHashMap.packetCount == 0) {
-    cout << "HashMap object exists... ";
+shuffledHashMap.initHashMap();  // INITIATE SHUFFLED HASHMAP OBJECT
+if(shuffledHashMap.packetCount == 0) {  // VERIFY THAT HASHMAP EXISTS
+    cout << "HashMap object created successfully... " << endl;
 }
-if((*shuffledHashMap.table[1]).domain == "uxui_interface") {
-    cout << "HashMap table and PQ substructures successfully initiated.";
+if((*shuffledHashMap.table[1]).domain == "uxui_interface") {  // VERIFY HASHMAP "table" MEMBER EXISTS AND HAS THE DESIRED ATTRIBUTES
+    cout << "HashMap table and PQ sub-structures successfully initiated." << endl;
 }
-
-while(!shuffledStack.empty()) {
+cout << "Routing DataPacket objects..." << endl;
+while(!shuffledStack.empty()) {  // INSERT DATA PACKETS FROM shuffledStack INTO shuffledHashMap USING assignPqDomainAndInsert MEMBER FUNCTION
     shared_ptr<DataPacket> curPacket;
     curPacket = shuffledStack.top();
     shuffledStack.pop();
-    shuffledHashMap.assignPqDomainAndInsert(curPacket);
+    shuffledHashMap.assignPqDomainAndInsert(curPacket);  // INSERT THE PACKET INTO shuffledHashMap
 }
-
-cout << endl << "  Routing DataPacket objects..." << endl;
 cout << endl;
-cout << shuffledHashMap.packetCount << " shuffled DataPacket objects were successfully routed and stored in the HashMapPQ data structure:" << endl;
-
-for(int k=1; k<6; ++k) {
+cout << shuffledHashMap.packetCount << " shuffled DataPacket objects were successfully routed and stored in the shuffledHashMap MaxHeapHashMap data structure." << endl;
+for(int k=1; k<6; ++k) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
     cout << "  " << (*shuffledHashMap.table[k]).nodeCount << " objects in the " << (*shuffledHashMap.table[k]).domain << " domain." << endl;
 }
-cout << endl << endl;
+cout << endl;
+
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP THREE: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
@@ -165,6 +164,11 @@ cout << endl << endl;
 
 
 
+
+
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP FOUR: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     return 0;
 }
