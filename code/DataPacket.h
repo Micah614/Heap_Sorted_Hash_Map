@@ -47,6 +47,8 @@ class DataPacket{
     string GetPacketData();
     // Getter function to access private data member: "packet_priority".
     int GetPacketPriority();
+    //
+    int GetPqIndex();
 };
 
 #endif // DATAPACKET_H__

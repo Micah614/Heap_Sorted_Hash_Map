@@ -119,11 +119,85 @@ void MaxHeapPQ::MaxHeapPercolateUp(int nodeIndex, int packetPriority) {
     }
 }
 
-
 // INDEXING AND REMOVAL FUNCTIONS
 // 
-shared_ptr<DataPacket> indexPqAndRetrievePacket(int domain_ID) {
-    // DO STUFF
+shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
+    shared_ptr<DataPacket> ret;  // returned DataPacket pointer object after index and removal operations.
+
+    // 1.) Compare the domain_ID integer key argument to the keys of the HashMap table and retrieve a pointer to the corresponding PQ.
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
+    shared_ptr<MaxHeapPQ> indexedDomain;  // declare a variable for the retrieved MaxHeapPQ pointer
+    for(it=table.begin(); it!=table.end(); it++) {
+        if(it->first == domain_ID){  // if any key matches domain_ID
+            indexedDomain = it->second;  // assign the value to indexedDomain
+        }
+    }
+    // 2.) Call MaxHeapPQ::RemoveTopPriority on the indexed PQ object and perform a removal operation.
+    shared_ptr<DataPacket> nextPacket = (*indexedDomain).pqTopPointer;  // Collect a pointer to the domain's top priority DataPacket
+    ret = (*indexedDomain).RemoveTopPriority(nextPacket);  // Access the indexed domain, and call RemoveTopPriority() on it's pqTopPointee
+
+    // 3.) Return the shared_ptr<DataPacket> object from the top of the heap.
+    return ret;
+}
+
+// 
+shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority(shared_ptr<DataPacket> nextPacket) {
+    shared_ptr<DataPacket> ret;  // 
+    int lastPqIndex = currentIndex;  // also (nodeCount - 1)
+    // COPY FIRST INDEX TO "ret"
+    pqMaxHeapArray[0] = pqMaxHeapArray[lastPqIndex];  // SWAP TOP NODE WITH LAST NODE
+    pqMaxHeapArray[lastPqIndex] = nullptr;  // DELETE LAST NODE
+    // MAINTAIN HEAP INVARIANTS
+    MaxHeapPercolateDown(pqMaxHeapArray[0]);  // PERCOLATE DOWN
+    pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer
+    ret = pqMaxHeapArray[0];  // COLLECT THE HIGHEST PRIORITY POINTER
+    // RETURN THE POINTER TO THE FUNCTION CALL
+    return ret;
+}
+
+int DataPacket::GetPqIndex() {
+    return pqIndex;
+}
+
+void MaxHeapPQ::MaxHeapPercolateDown(shared_ptr<DataPacket> percNode) {
+    int percIndex = (*percNode).GetPqIndex();  // INTITIALIZE percIndex
+    shared_ptr<DataPacket> tempPacket;
+    int leftChildIdx;  int rightChildIdx;  int percNodePriority;  int leftChildPriority;  int rightChildPriority;
+
+    bool percDone = false;  // WHILE LOOP SENTINEL VALUE
+    while(percDone == false) {
+        
+        // CALCULATE CHILD INDICES
+        leftChildIdx = (2*percIndex)+1;
+        rightChildIdx = (2*percIndex)+2;
+        // IF PERCNODE IS A LEAF -> DONE
+        if(leftChildIdx >= currentIndex || rightChildIdx >= currentIndex) {
+            percDone = true; // percIndex IS AT THE LAST LEVEL. NO FURTHER ACTION IS REQUIRED.
+            break;
+        }
+        // CALCULATE PRIORITIES TO FACILIATE COMPARISON
+        percNodePriority = (*pqMaxHeapArray[percIndex]).GetPacketPriority();
+        leftChildPriority = (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority();
+        rightChildPriority = (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority();
+        // COMPARE AND SWAP, OR EXIT THE FUNCTION
+        if(leftChildPriority > percNodePriority && leftChildPriority > rightChildPriority) {
+            // SWAP LEFT CHILD AND PERCNODE
+            tempPacket = pqMaxHeapArray[leftChildIdx];
+            pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
+            pqMaxHeapArray[percIndex] = tempPacket;
+            percIndex = leftChildIdx;  // UPDATE percIndex
+        }
+        else if(rightChildPriority > percNodePriority && rightChildPriority > leftChildPriority) {
+            // SWAP RIGHT CHILD AND PERCNODE
+            tempPacket = pqMaxHeapArray[rightChildIdx];
+            pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
+            pqMaxHeapArray[percIndex] = tempPacket;
+            percIndex = rightChildIdx;  // UPDATE percIndex
+        }
+        else {
+            percDone = true;
+        }
+    }
 }
 
 
