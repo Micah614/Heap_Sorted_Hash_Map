@@ -153,7 +153,6 @@ for(int k=1; k<6; ++k) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
 cout << endl;
 
 
-
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP THREE: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
@@ -170,7 +169,10 @@ vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED D
 
 
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP FOUR: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP FOUR: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
 
     return 0;
 }
