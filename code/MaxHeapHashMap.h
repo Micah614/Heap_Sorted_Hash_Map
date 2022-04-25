@@ -17,47 +17,46 @@ using namespace std;
 
 // UXUI_INTERFACE 1 || DATABASE_CONFIG 2 || LAUNCH_FILES 3 || REGISTRATION_MATERIALS 4 || EXECUTABLE_FILES 5
 struct MaxHeapPQ {  // Five MaxHeapPQ's are instantiated in every HashMap object
-  MaxHeapPQ();  // PQ default constructor. Create one heap for each domain
-  ~MaxHeapPQ();  // Destructor
   string domain;  // the PQ domain identity
   int nodeCount;  // keeps track of how populated a heap is.
-  int currentIndex;  // first open index in the pointer array.
+  int nextIndex;  // first open index in the pointer array.
   shared_ptr<DataPacket> pqMaxHeapArray[PQ_SIZE];  // variable size-allocated array of DataPacket shared pointers
   shared_ptr<DataPacket> pqTopPointer;  // always found at maxHeapArray[0]
 
-  // Initiation and insertion functions
+  // INITIATION FUNCTIONS
   void InitPqDomain(string domain_ID);
+  MaxHeapPQ();  // PQ default constructor. Create one heap for each domain
+  ~MaxHeapPQ();  // Destructor
+
+  // STORAGE FUNCTIONS
   void pqInsert(shared_ptr<DataPacket> packet);  // inserts a DataPacket pointer object into appropriate max heap PQ
-  void MaxHeapPercolateUp(int nodeIndex, int packetPriority);
+  void MaxHeapPercolateUp(shared_ptr<DataPacket> packet);
 
-  int pqDomainNodeCount(int domain_ID);  // retrieves the node_count for a selected PQ heap domain
-  shared_ptr<DataPacket> pqDomainPeek(int domain_ID);
-
-  // Index and retrieval functions
-  shared_ptr<DataPacket> RemoveTopPriority(shared_ptr<DataPacket> nextPacket);  // 
-  void MaxHeapPercolateDown(shared_ptr<DataPacket> percNode);  // 
-
+  // RETRIEVAL FUNCTIONS
+  shared_ptr<DataPacket> RemoveTopPriority();  // 
+  void MaxHeapPercolateDown();  // 
 };
 
 
 typedef std::map<int, shared_ptr<MaxHeapPQ>> hashMap;  // typedef vector<shared_ptr<MaxHeapPQ>> hashTable;
 // UXUI_INTERFACE 1 || DATABASE_CONFIG 2 || LAUNCH_FILES 3 || REGISTRATION_MATERIALS 4 || EXECUTABLE_FILES 5
 
+
 struct HashMap {  // HashMap contains a five key map of domain ID's leading to shared pointer MaxHeapPQ top node pointers
-  HashMap();  // Default constructor for PerfectHashTable objects
-  ~HashMap();  // Destructor for PerfectHashTable objects
   int packetCount; // DataPacket count accross all five domains
   hashMap table;  // points to a map with key:value pairs domain_ID : shared_ptr<MaxHeapPQ>;
-  // STORAGE FUNCTIONS
+
+  // INITIATION FUNCTIONS
+  HashMap();  // Default constructor for PerfectHashTable objects
+  ~HashMap();  // Destructor for PerfectHashTable objects
   void initHashMap();  // initializes five (5) imbedded domain priority queues and a hashMap table routing object
+
+  // STORAGE FUNCTIONS
   void assignPqDomainAndInsert(shared_ptr<DataPacket> packet);  // accepts a DataPacket shared_ptr, then categorizes and inserts it by domain_ID
 
-// RESUME HERE
   // RETRIEVAL FUNCTIONS
   shared_ptr<DataPacket> indexPqAndRetrievePacket(int domain_ID);  // accepts an integer domain_ID, indexes MaxHeapPQ objects and extracts the top pointer
-  
-
-
+  void FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector);  // fill a destination vector with DataPacket object
 };
 
 

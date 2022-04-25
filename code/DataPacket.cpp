@@ -19,7 +19,6 @@ using namespace std;
 DataPacket::DataPacket() {
     // TO DO
 }
-
 // Destructor
 DataPacket::~DataPacket() {
     // ALL GOOD
@@ -38,31 +37,48 @@ shared_ptr<DataPacket> DataPacket::InitDataPacket(string data, int packet_priori
   return dataPacket;
 }
 
+// InsertNodeData assigns a DataPacket pqIndex value and populates it's other indices
+void DataPacket::InsertNodeData(int nodePqIndex) {
+    pqIndex = nodePqIndex;
+    leftChildIndex = (2*nodePqIndex) + 1;
+    rightChildIndex = (2*nodePqIndex) + 2;
+    
+    if(nodePqIndex == 0) {
+        parentIndex = NULL;
+        //NULL OR '-1'?
+    }
+    else{
+        parentIndex = floor((nodePqIndex-1)/2);  // calculate parent index
+    }
+}
+
+// DATAPACKET GETTER FUNCTIONS
+
 // Return DataPacket private member var "data" (Getter function)
 string DataPacket::GetPacketData() {
     return data;
 }
-
 // 
 int DataPacket::GetPacketPriority() {
     return packet_priority;
 }
-
-// InsertNodeData assigns a DataPacket pqIndex value and populates it's other indices
-void DataPacket::InsertNodeData(int nodePqIndex) {
-    int parentidx;
-    if(nodePqIndex == 0) {  // the node's
-        parentidx = -1;  // top node has no parent. (default = -1)
-    }
-    else{
-        parentidx = floor((nodePqIndex-1)/2);  // calculate parent index
-    }
-    // update DataPacket private member variables.
-    parentIndex = parentidx;
-    pqIndex = nodePqIndex;
-    leftChildIndex = (2*nodePqIndex) + 1;
-    rightChildIndex = (2*nodePqIndex) + 2;
+// 
+int DataPacket::GetPqIndex() {
+    return pqIndex;
 }
+//
+int DataPacket::GetParentIndex() {
+    return parentIndex;
+}
+//
+int DataPacket::GetLeftChildIndex() {
+    return leftChildIndex;
+}
+//
+int DataPacket::GetRightChildIndex() {
+    return rightChildIndex;
+}
+
 
 
 

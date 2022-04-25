@@ -17,7 +17,7 @@ using namespace std;
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@ HASHMAP FUNCTIONS (START) @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-/* EACH HASHMAP INSTANTIATES AND CONTROLS FIVE MAXHEAPPQ DOMAINS*/
+/* EACH HASHMAP INSTANTIATES AND CONTROLS FIVE SEPARATE MAXHEAPPQ DOMAINS*/
 // 
 HashMap::HashMap() {
 }
@@ -60,146 +60,184 @@ void HashMap::initHashMap() {
 void MaxHeapPQ::InitPqDomain(string domain_ID) {
     domain = domain_ID;  // update domain_ID.
     nodeCount = 0;  // set node count at zero
-    currentIndex = 0;  // set currentIndex at zero.
+    nextIndex = 0;  // set currentIndex at zero.
     for(int i=0; i<PQ_SIZE; ++i) {  // initialize the array with NULL pointers
         pqMaxHeapArray[i] = nullptr;  // populate the array with null pointers to start. PQ_SIZE == 100
     }
     pqTopPointer = pqMaxHeapArray[0];  // pqTopPointer is always at index zero.
 }
 
+
 // use this function to insert DataPackets into instantiated MaxHeapHashMap objects.
 void HashMap::assignPqDomainAndInsert(shared_ptr<DataPacket> packet) {
-    int domainKey = (*packet).domain_ID;  // extract domain_ID from DataPacket (public)
-    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
-    shared_ptr<MaxHeapPQ> assignedPQ;  // declare a variable for collecting the MaxHeapPQ pointer
+    int domainKey = (*packet).domain_ID;  // EXTRACT DOMAIN_ID
+    shared_ptr<MaxHeapPQ> assignedPQ;  // DECLARE VARIABLE FOR ASSIGNED PQ
+
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // ITERATE THROUGH "table"
     for(it=table.begin(); it!=table.end(); it++) {
         if(it->first == domainKey) {
-            assignedPQ = it->second;
+            assignedPQ = it->second;  // COLLECT POINTER TO ASSIGNED DOMAIN PQ
         }
     }
-    (*assignedPQ).pqInsert(packet);  // access the underlying MaxHeapPQ and insert the packet pointer.
-    packetCount++;  // HashMap's packetCounter is incremented.
+    (*assignedPQ).pqInsert(packet);  // INSERT PACKET INTO ASSIGNED PQ
+    packetCount++;  // "packetCount" INCREASES BY ONE
 }
 
+
 void MaxHeapPQ::pqInsert(shared_ptr<DataPacket> packet) {
-    int packetPriority = (*packet).GetPacketPriority();  // extract the packet priority
-    int insertionIndex = currentIndex;  // member variables are accessible inside MaxHeapPQ member functions 
-    // If the array is empty...
-    if(nodeCount == 0) {  
-        (*packet).InsertNodeData(0);  // 
-        pqMaxHeapArray[insertionIndex] = packet;  // 
-        currentIndex++;  // 
-        nodeCount++;  // 
+    int packetPriority = (*packet).GetPacketPriority();  // COLLECT PRIORITY
+    if(nextIndex == 0) {  // "pqArray" IS EMPTY
+        (*packet).InsertNodeData(0);  // UPDATE DataPacket MEMBER VARIABLES
+        pqMaxHeapArray[0] = packet;  // INSERT packet AT INDEX ZERO
+        nextIndex++;  // INCREMENT nextIndex
+        nodeCount++;  // INCREMENT nodeCount
         return;
     }
     else {
-        (*packet).InsertNodeData(insertionIndex);  // 
-        pqMaxHeapArray[insertionIndex] = packet;  // 
-        nodeCount++;  // 
-        currentIndex++;  // 
-        MaxHeapPercolateUp(currentIndex-1, packetPriority);
+        (*packet).InsertNodeData(nextIndex);  // UPDATE DataPacket MEMBER VARIABLES
+        pqMaxHeapArray[nextIndex] = packet;  // INSERT packet AT nextIndex
+        nodeCount++;  // INCREMENT MAXHEAP nodeCount
+        nextIndex++;  // INCREMENT MAXHEAP nextIndex
+        MaxHeapPercolateUp(packet);  // PERCOLATE UP AT 
     }
   return;
 }
 
-void MaxHeapPQ::MaxHeapPercolateUp(int nodeIndex, int packetPriority) {
-    shared_ptr<DataPacket> temp;  // temporary pointer variable to switch node pqArray indices
-    int percolateIndex = nodeIndex;
-    while(percolateIndex > 0) {
-        int parentIdx = floor((percolateIndex - 1) / 2);
-        if( (*pqMaxHeapArray[percolateIndex]).GetPacketPriority() < (*pqMaxHeapArray[parentIdx]).GetPacketPriority()) {
-            return;  // Done
-        }
-        else {  // otherwise, swap 
-            temp = pqMaxHeapArray[percolateIndex];  // temp variable holds child pointer
-            pqMaxHeapArray[percolateIndex] = pqMaxHeapArray[parentIdx];  // child index holds parent pointer
-            pqMaxHeapArray[parentIdx] = temp;  // parent index holds previous child pointer
-            percolateIndex = parentIdx;  // update percolateIndex for next iteration.
-        }
-    }
-}
+void MaxHeapPQ::MaxHeapPercolateUp(shared_ptr<DataPacket> packet) {
+    int parentIdx;
+    int parentPriority;
+    int percPriority;
+    int percIdx = (*packet).GetPqIndex();
+    shared_ptr<DataPacket> temp;
 
-// INDEXING AND REMOVAL FUNCTIONS
-// 
-shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
-    shared_ptr<DataPacket> ret;  // returned DataPacket pointer object after index and removal operations.
+    bool isDone = false;
+    while(isDone != true) {  // 
 
-    // 1.) Compare the domain_ID integer key argument to the keys of the HashMap table and retrieve a pointer to the corresponding PQ.
-    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
-    shared_ptr<MaxHeapPQ> indexedDomain;  // declare a variable for the retrieved MaxHeapPQ pointer
-    for(it=table.begin(); it!=table.end(); it++) {
-        if(it->first == domain_ID){  // if any key matches domain_ID
-            indexedDomain = it->second;  // assign the value to indexedDomain
-        }
-    }
-    // 2.) Call MaxHeapPQ::RemoveTopPriority on the indexed PQ object and perform a removal operation.
-    shared_ptr<DataPacket> nextPacket = (*indexedDomain).pqTopPointer;  // Collect a pointer to the domain's top priority DataPacket
-    ret = (*indexedDomain).RemoveTopPriority(nextPacket);  // Access the indexed domain, and call RemoveTopPriority() on it's pqTopPointee
-
-    // 3.) Return the shared_ptr<DataPacket> object from the top of the heap.
-    return ret;
-}
-
-// 
-shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority(shared_ptr<DataPacket> nextPacket) {
-    shared_ptr<DataPacket> ret;  // 
-    int lastPqIndex = currentIndex;  // also (nodeCount - 1)
-    // COPY FIRST INDEX TO "ret"
-    pqMaxHeapArray[0] = pqMaxHeapArray[lastPqIndex];  // SWAP TOP NODE WITH LAST NODE
-    pqMaxHeapArray[lastPqIndex] = nullptr;  // DELETE LAST NODE
-    // MAINTAIN HEAP INVARIANTS
-    MaxHeapPercolateDown(pqMaxHeapArray[0]);  // PERCOLATE DOWN
-    pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer
-    ret = pqMaxHeapArray[0];  // COLLECT THE HIGHEST PRIORITY POINTER
-    // RETURN THE POINTER TO THE FUNCTION CALL
-    return ret;
-}
-
-int DataPacket::GetPqIndex() {
-    return pqIndex;
-}
-
-void MaxHeapPQ::MaxHeapPercolateDown(shared_ptr<DataPacket> percNode) {
-    int percIndex = (*percNode).GetPqIndex();  // INTITIALIZE percIndex
-    shared_ptr<DataPacket> tempPacket;
-    int leftChildIdx;  int rightChildIdx;  int percNodePriority;  int leftChildPriority;  int rightChildPriority;
-
-    bool percDone = false;  // WHILE LOOP SENTINEL VALUE
-    while(percDone == false) {
-        
-        // CALCULATE CHILD INDICES
-        leftChildIdx = (2*percIndex)+1;
-        rightChildIdx = (2*percIndex)+2;
-        // IF PERCNODE IS A LEAF -> DONE
-        if(leftChildIdx >= currentIndex || rightChildIdx >= currentIndex) {
-            percDone = true; // percIndex IS AT THE LAST LEVEL. NO FURTHER ACTION IS REQUIRED.
+        parentIdx = (*packet).GetParentIndex();
+        percPriority = (*packet).GetPacketPriority(); 
+        parentPriority = (*pqMaxHeapArray[parentIdx]).GetPacketPriority();
+    
+        if(parentPriority > percPriority || parentIdx == NULL) {
+            isDone = true;
             break;
         }
-        // CALCULATE PRIORITIES TO FACILIATE COMPARISON
+        else {
+            // SWAP DATA
+            (*pqMaxHeapArray[percIdx]).InsertNodeData(parentIdx);
+            (*pqMaxHeapArray[parentIdx]).InsertNodeData(percIdx);
+            // SWAP LOCATIONS
+            temp = pqMaxHeapArray[parentIdx];
+            pqMaxHeapArray[parentIdx] = pqMaxHeapArray[percIdx];
+            pqMaxHeapArray[percIdx] = temp;
+            percIdx = parentIdx;
+        }  
+    }
+    return;
+}
+
+// INDEX AND REMOVAL FUNCTIONS
+// 
+shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
+    shared_ptr<MaxHeapPQ> indexedPQ;  // 
+    shared_ptr<DataPacket> returnPacket;  // 
+
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // 
+    for(it=table.begin(); it!=table.end(); it++) {
+        if(it->first == domain_ID){  // 
+            indexedPQ = it->second;
+        }
+    }
+    returnPacket = (*indexedPQ).RemoveTopPriority();  // CALL RemoveTopPriority ON *indexedPQ
+    packetCount--;  // HashMap packetCount DECREMENTS BY ONE.
+    return returnPacket;
+}
+
+// 
+shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority() {
+    shared_ptr<DataPacket> returnPacket;  // 
+    int lastIdx = nextIndex - 1;  // LAST OCCUPIED pqMaxHeapArray INDEX
+
+    // MAX PRIORITY IS AT INDEX 0
+    returnPacket = pqMaxHeapArray[0];  // COLLECT THE TOP POINTER
+    pqMaxHeapArray[0] = pqMaxHeapArray[lastIdx];  // SWAP TOP NODE WITH LAST NODE
+    (*pqMaxHeapArray[0]).InsertNodeData(0);  // UPDATE DATAPACKET MEMBER VARIABLES
+    pqMaxHeapArray[lastIdx] = nullptr;  // DELETE LAST INDEX
+    nodeCount--;  // 
+    nextIndex--;  // 
+
+    // MAINTAIN HEAP INVARIANTS
+    MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
+    pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
+    return returnPacket;
+}
+
+// FIX ME!!!!
+void MaxHeapPQ::MaxHeapPercolateDown() {
+    int leftChildIdx;
+    int rightChildIdx;
+    int percNodePriority;
+    int leftChildPriority;
+    int rightChildPriority;
+    //
+    shared_ptr<DataPacket> temp;
+    int percIndex = 0;
+    bool done = false;  // DECLARE WHILE-LOOP SENTINEL VALUE
+    //
+    while(done != true) {
+        //
+        leftChildIdx = (*pqMaxHeapArray[percIndex]).GetLeftChildIndex();
+        rightChildIdx = (*pqMaxHeapArray[percIndex]).GetRightChildIndex();
+        //
         percNodePriority = (*pqMaxHeapArray[percIndex]).GetPacketPriority();
         leftChildPriority = (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority();
         rightChildPriority = (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority();
-        // COMPARE AND SWAP, OR EXIT THE FUNCTION
-        if(leftChildPriority > percNodePriority && leftChildPriority > rightChildPriority) {
-            // SWAP LEFT CHILD AND PERCNODE
-            tempPacket = pqMaxHeapArray[leftChildIdx];
+        //
+        if(leftChildPriority > percNodePriority && leftChildPriority > rightChildPriority) {  // SWAP LEFT CHILD AND PERCNODE
+            // SWAP DATA
+            (*pqMaxHeapArray[percIndex]).InsertNodeData(leftChildIdx);
+            (*pqMaxHeapArray[leftChildIdx]).InsertNodeData(percIndex);
+            // SWAP LOCATIONS
+            temp = pqMaxHeapArray[leftChildIdx];
             pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
-            pqMaxHeapArray[percIndex] = tempPacket;
-            percIndex = leftChildIdx;  // UPDATE percIndex
+            pqMaxHeapArray[percIndex] = temp;
+            percIndex = leftChildIdx;
+            break;
         }
-        else if(rightChildPriority > percNodePriority && rightChildPriority > leftChildPriority) {
-            // SWAP RIGHT CHILD AND PERCNODE
-            tempPacket = pqMaxHeapArray[rightChildIdx];
+        else if(rightChildPriority > percNodePriority && rightChildPriority > leftChildPriority) {  // SWAP RIGHT CHILD AND PERCNODE
+            // SWAP DATA
+            (*pqMaxHeapArray[percIndex]).InsertNodeData(rightChildIdx);
+            (*pqMaxHeapArray[rightChildIdx]).InsertNodeData(percIndex);
+            // SWAP LOCATIONS
+            temp = pqMaxHeapArray[rightChildIdx];
             pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
-            pqMaxHeapArray[percIndex] = tempPacket;
-            percIndex = rightChildIdx;  // UPDATE percIndex
+            pqMaxHeapArray[percIndex] = temp;
+            percIndex = rightChildIdx; 
+            break;
         }
         else {
-            percDone = true;
+            done = true;
         }
     }
 }
 
+
+// EMPTY A HASHMAP OBJECT INTO A RECEIVING VECTOR
+void HashMap::FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector) {
+    shared_ptr<DataPacket> curNode;
+    shared_ptr<MaxHeapPQ> currentDomain;
+    int domainNumber;
+
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
+    for(it=table.begin(); it!=table.end(); it++) {
+        currentDomain = it->second;
+        domainNumber = it->first;
+
+        while((*currentDomain).nodeCount > 0) {
+            curNode = indexPqAndRetrievePacket(domainNumber);  // 
+            writeToVector.push_back(curNode);  // 
+        }
+    }
+}
 
 
 

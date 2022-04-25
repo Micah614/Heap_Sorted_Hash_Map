@@ -25,30 +25,27 @@ class DataPacket{
   private:
     string data;  // Primary DataPacket info
     int packet_priority;  // assigned during creation
-    
-    // The following member variables are declared during pq insertion
+    // Variables defined after insertion:
     int pqIndex;  // location of the pointer in the MaxHeapPQ array
-    int parentIndex;  // index of the parent = floor((i-1)/2)
     int leftChildIndex;  // index of the left child = (2 * i) + 1
     int rightChildIndex;  // index of the right child = (2 * i) + 2
+    int parentIndex;  // index of the parent = floor((i-1)/2)
 
   public:
     int domain_ID;  // domain ID key used to route DataPackets to a PQ domain.
-    
-    // Default constructor
-    DataPacket();
-    // DataPacket deconstructor.
-    ~DataPacket();
+    DataPacket();  // Default constructor    
+    ~DataPacket();  // DataPacket deconstructor.
     // InitDataPacket() returns a shared pointer to a DataPacket object 
     shared_ptr<DataPacket> InitDataPacket(string data, int packet_priority, int domain_ID);
-    // 
-    void InsertNodeData(int nodePqIndex);
-    // Getter function to access private data member: "data".
+    void InsertNodeData(int nodePqIndex);  // updates member data following add/move/remove
+
+    // Getter functions to access private data members:
     string GetPacketData();
-    // Getter function to access private data member: "packet_priority".
     int GetPacketPriority();
-    //
     int GetPqIndex();
+    int GetParentIndex();
+    int GetLeftChildIndex();
+    int GetRightChildIndex();
 };
 
 #endif // DATAPACKET_H__
