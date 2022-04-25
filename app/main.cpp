@@ -20,12 +20,13 @@ using namespace std;
 
 int main(){
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP ONE: CREATE THE DATAPACKET OBJECTS AND LOAD SHARED POINTERS INTO STACKS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE ONE: CREATE DATAPACKET OBJECTS AND LOAD SHARED POINTERS INTO STACKS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     std::array<int,50> packetPriority;  // ARRAY CONTAINING PACKET PRIORITIES
     std::array<string,50> packetData;  // ARRAY CONTAINING PACKET DATA
     std::array<int,50> packetDomainID;  // ARRAY CONTAINING PACKET DOMAIN_IDs
 
-// LOAD THE ARRAYS WITH NODE DATA
+// LOAD EACH ARRAY WITH DATA
 for(int i=0; i<packetPriority.size(); ++i) {
     int j;
     if(i<14) {          // 0-13
@@ -53,9 +54,11 @@ for(int i=0; i<packetPriority.size(); ++i) {
     packetData[i] = to_string(i+1);
 }
 
-// CREATE AN IN-ORDER DATA FEED STACK "inOrderStack"
+
+
+// CREATE AN IN-ORDER DATAPACKET STACK CALLED "inOrderStack"
 std::stack<shared_ptr<DataPacket>> inOrderStack;  // STACK TO HOLD IN-ORDER FEED
-for(int a=packetData.size()-1; a>-1; a--) {
+for(int a=packetData.size()-1; a>-1; a--) {  // PUSH TO STACK IN REVERSE ORDER
     DataPacket curNode;
     shared_ptr<DataPacket> node = curNode.InitDataPacket(packetData[a], packetPriority[a], packetDomainID[a]);  // INITDATAPACKET
     inOrderStack.push(node);
@@ -71,6 +74,8 @@ while(!tempStack.empty()) {
 }
 cout << endl << "  In-order stack size: " << inOrderStack.size() << endl;
 
+
+
 // CREATE A SHUFFLED DATA FEED 
 std::vector<shared_ptr<DataPacket>> shuffleVec;
 std::stack<shared_ptr<DataPacket>> tempStack2 = inOrderStack;  // COPY inOrderStack TO tempStack2
@@ -81,8 +86,7 @@ while(!tempStack2.empty()) {
     tempStack2.pop();
     shuffleVec.push_back(curPacket);
 }
-    std::random_shuffle(shuffleVec.begin(), shuffleVec.end());  // SHUFFLE THE VECTOR
-
+std::random_shuffle(shuffleVec.begin(), shuffleVec.end());  // SHUFFLE THE VECTOR
 // PUSH THE SHUFFLED OBJECTS INTO A STACK
 std::stack<shared_ptr<DataPacket>> shuffledStack;  // DECLARE A STACK
 for(int c=0; c<shuffleVec.size(); ++c) {
@@ -102,10 +106,13 @@ cout << endl << "  Shuffled stack size: " << shuffledStack.size() << endl << end
 
 
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP TWO: CREATE TWO MAX-HEAP-HASHMAP OBJECTS AND INSERT DATAPACKETS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// CREATE IN-ORDER HASHMAP OBJECT
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE TWO: CREATE "IN-ORDER" AND "SHUFFLED" HASHMAP OBJECTS AND INSERT DATAPACKETS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+// IN-ORDER HASHMAP OBJECT:
 cout << "~~~~~~" << endl << "Creating In-Order MaxHeapHashMap object..." << endl;
-HashMap inOrderHashMap;  // IN-ORDER HASHMAP OBJECT
+HashMap inOrderHashMap;  // DECLARE IN-ORDER HASHMAP OBJECT
 inOrderHashMap.initHashMap();  // INITIATE IN-ORDER HASHMAP OBJECT
 if(inOrderHashMap.packetCount == 0) {  // VERIFY THAT HASHMAP EXISTS
     cout << "HashMap object created successfully... " << endl;
@@ -128,7 +135,8 @@ for(int j=1; j<6; ++j) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
 cout << endl;
 
 
-// CREATE SHUFFLED HASHMAP OBJECT
+
+// SHUFFLED HASHMAP OBJECT:
 cout << "~~~~~~" << endl << "Creating Shuffled MaxHeapHashMap object..." << endl;
 HashMap shuffledHashMap;  // SHUFFLED HASHMAP OBJECT
 shuffledHashMap.initHashMap();  // INITIATE SHUFFLED HASHMAP OBJECT
@@ -153,15 +161,22 @@ for(int k=1; k<6; ++k) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
 cout << endl;
 
 
+
+
+
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP THREE: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
 vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED DATA
 
-// CREATE A WHILE-LOOP ISSUING DOMAIN ID REQUESTS TO inOrderHashMap AND shuffledHashMap
-    // STORE THE RETRIEVED POINTERS IN THE ASSIGNED VECTORS
+// CALL indexPqAndRetrievePacket() ON "inOrderHashMap" AND "shuffledHashMap"; PLACE RETRIEVED POINTERS INTO THE ASSIGNED VECTORS
 
-// VERIFY THAT THE CONTENTS OF EACH VECTOR ARE SORTED AND IDENTICAL
+shared_ptr<DataPacket> checkPacket;
+
+for(int i=0; i=13; ++i) {
+    checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+    cout << (*checkPacket).GetPacketData() << endl;
+}
 
 
 
@@ -170,6 +185,8 @@ vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED D
 
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP FOUR: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
 
 
 
