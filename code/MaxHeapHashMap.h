@@ -56,8 +56,9 @@ struct HashMap {  // HashMap contains a five key map of domain ID's leading to s
 
   // RETRIEVAL FUNCTIONS
   shared_ptr<DataPacket> indexPqAndRetrievePacket(int domain_ID);  // accepts an integer domain_ID, indexes MaxHeapPQ objects and extracts the top pointer
-  void FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector);  // fill a destination vector with DataPacket object
+  vector<shared_ptr<DataPacket>> FillDestinationVector();  // fill a destination vector with DataPacket object
 };
+
 
 
 

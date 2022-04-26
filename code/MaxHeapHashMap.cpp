@@ -93,7 +93,6 @@ void MaxHeapPQ::pqInsert(shared_ptr<DataPacket> packet) {
         return;
     }
     else {
-        // (*packet).InsertNodeData(nextIndex);  // UPDATE DataPacket MEMBER VARIABLES
         pqMaxHeapArray[nextIndex] = packet;  // INSERT packet AT nextIndex
         (*packet).InsertNodeData(nextIndex);
         nodeCount++;  // INCREMENT MAXHEAP nodeCount
@@ -147,7 +146,6 @@ shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
     }
     returnPacket = (*indexedPQ).RemoveTopPriority();  // CALL RemoveTopPriority ON *indexedPQ
     packetCount--;  // HashMap packetCount DECREMENTS BY ONE.
-    // (*indexedPQ).MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
     (*indexedPQ).pqTopPointer = (*indexedPQ).pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
     return returnPacket;
 }
@@ -169,8 +167,6 @@ shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority() {
         nextIndex--;  // 
         MaxHeapPercolateDown(0);  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
     }
-    // MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
-    // pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
     return returnPacket;
 }
 
@@ -230,23 +226,51 @@ void MaxHeapPQ::MaxHeapPercolateDown(int index) {
     }
 }
 
-    // EMPTY A HASHMAP OBJECT INTO A RECEIVING VECTOR
-    void HashMap::FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector) {
-        shared_ptr<DataPacket> curNode;
-        shared_ptr<MaxHeapPQ> currentDomain;
-        int domainNumber;
 
-        map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
-        for(it=table.begin(); it!=table.end(); it++) {
-            currentDomain = it->second;
-            domainNumber = it->first;
+// EMPTY ALL HASHMAP OBJECTS INTO A RESULTS VECTOR
+vector<shared_ptr<DataPacket>> HashMap::FillDestinationVector() {
+    std::vector<shared_ptr<DataPacket>> retVec;
+    shared_ptr<MaxHeapPQ> currentDomain;
+    shared_ptr<DataPacket> curNode;
+    shared_ptr<DataPacket> percNode;
+    int domainKey;
 
-            while((*currentDomain).nodeCount > 0) {
-                curNode = indexPqAndRetrievePacket(domainNumber);  // 
-                writeToVector.push_back(curNode);  // 
-            }
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;
+    for(it=table.begin(); it!=table.end(); it++) {
+        domainKey = it->first;
+        currentDomain = it->second;
+        int domainNodeCount = (*currentDomain).nodeCount;
+
+        // PERFORM MaxHeapPercolateDown AND MaxHeapPercolateUp TO HOMOGENIZE THE SETS
+        for(int i = 0; i < (*currentDomain).nodeCount; ++i) {
+            (*currentDomain).MaxHeapPercolateDown(i);
         }
+        for(int i = (*currentDomain).nodeCount-1; i > 0; i--) {
+            percNode = (*currentDomain).pqMaxHeapArray[i];
+            (*currentDomain).MaxHeapPercolateUp(percNode);
+        }
+
+        while(domainNodeCount > 0) {
+            curNode = indexPqAndRetrievePacket(domainKey);
+            if(curNode != NULL) {
+                retVec.push_back(curNode);
+            }
+            else {
+                break;
+            }
+            domainNodeCount--;
+        }
+    }
+    return retVec;
 }
+
+
+
+
+
+
+
+
 
 
 
