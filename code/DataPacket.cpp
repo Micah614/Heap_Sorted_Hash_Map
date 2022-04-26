@@ -15,13 +15,13 @@
 using namespace std;
 
 
-// Constructo
+// Constructor
 DataPacket::DataPacket() {
     // TO DO
 }
 // Destructor
 DataPacket::~DataPacket() {
-    // ALL GOOD
+    // TO DO
 }
 
 // Initiate a data packet object with specified attributes and return a shared pointer to that object
@@ -30,9 +30,6 @@ shared_ptr<DataPacket> DataPacket::InitDataPacket(string data, int packet_priori
     dataPacket->data = data;
     dataPacket->packet_priority = packet_priority;
     dataPacket->domain_ID = domain_ID;
-    /*NOTE: The DataPacket member variables: pqIndex, parentIndex, leftChildIndex, and rightChildIndex 
-    are all instantiated during insertion into a MaxHeapPQ data structure. see MaxHeapHashMap.cpp to see 
-    how this happens. */
 
   return dataPacket;
 }
@@ -42,43 +39,37 @@ void DataPacket::InsertNodeData(int nodePqIndex) {
     pqIndex = nodePqIndex;
     leftChildIndex = (2*nodePqIndex) + 1;
     rightChildIndex = (2*nodePqIndex) + 2;
-    
+
     if(nodePqIndex == 0) {
-        parentIndex = NULL;
-        //NULL OR '-1'?
+        parentIndex = NULL;  // NULL OR '-1'?
     }
     else{
         parentIndex = floor((nodePqIndex-1)/2);  // calculate parent index
     }
 }
 
-// DATAPACKET GETTER FUNCTIONS
-
-// Return DataPacket private member var "data" (Getter function)
 string DataPacket::GetPacketData() {
     return data;
 }
-// 
+ 
 int DataPacket::GetPacketPriority() {
     return packet_priority;
 }
-// 
+ 
 int DataPacket::GetPqIndex() {
     return pqIndex;
 }
-//
+
 int DataPacket::GetParentIndex() {
     return parentIndex;
 }
-//
+
 int DataPacket::GetLeftChildIndex() {
     return leftChildIndex;
 }
-//
+
 int DataPacket::GetRightChildIndex() {
     return rightChildIndex;
 }
-
-
 
 

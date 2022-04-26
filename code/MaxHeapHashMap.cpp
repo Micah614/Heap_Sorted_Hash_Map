@@ -83,10 +83,9 @@ void HashMap::assignPqDomainAndInsert(shared_ptr<DataPacket> packet) {
     packetCount++;  // "packetCount" INCREASES BY ONE
 }
 
-
 void MaxHeapPQ::pqInsert(shared_ptr<DataPacket> packet) {
-    int packetPriority = (*packet).GetPacketPriority();  // COLLECT PRIORITY
-    if(nextIndex == 0) {  // "pqArray" IS EMPTY
+
+    if(nodeCount == 0) {  // "pqArray" IS EMPTY
         (*packet).InsertNodeData(0);  // UPDATE DataPacket MEMBER VARIABLES
         pqMaxHeapArray[0] = packet;  // INSERT packet AT INDEX ZERO
         nextIndex++;  // INCREMENT nextIndex
@@ -94,48 +93,47 @@ void MaxHeapPQ::pqInsert(shared_ptr<DataPacket> packet) {
         return;
     }
     else {
-        (*packet).InsertNodeData(nextIndex);  // UPDATE DataPacket MEMBER VARIABLES
+        // (*packet).InsertNodeData(nextIndex);  // UPDATE DataPacket MEMBER VARIABLES
         pqMaxHeapArray[nextIndex] = packet;  // INSERT packet AT nextIndex
+        (*packet).InsertNodeData(nextIndex);
         nodeCount++;  // INCREMENT MAXHEAP nodeCount
         nextIndex++;  // INCREMENT MAXHEAP nextIndex
-        MaxHeapPercolateUp(packet);  // PERCOLATE UP AT 
+        MaxHeapPercolateUp(packet);  // PERCOLATE UP
+        pqTopPointer = pqMaxHeapArray[0];
+        return;
     }
-  return;
 }
 
 void MaxHeapPQ::MaxHeapPercolateUp(shared_ptr<DataPacket> packet) {
-    int parentIdx;
-    int parentPriority;
-    int percPriority;
-    int percIdx = (*packet).GetPqIndex();
+    int percIdx = nextIndex-1;
+    int percPriority = (*packet).GetPacketPriority();
+    int parentIdx = floor((percIdx-1)/2);
+    int parentPriority = (*pqMaxHeapArray[parentIdx]).GetPacketPriority();
     shared_ptr<DataPacket> temp;
 
-    bool isDone = false;
-    while(isDone != true) {  // 
-
-        parentIdx = (*packet).GetParentIndex();
-        percPriority = (*packet).GetPacketPriority(); 
+    if(parentPriority > percPriority || percIdx == 0) { 
+        (*packet).InsertNodeData(percIdx);
+        return;
+    }
+    while(percPriority > parentPriority && percIdx > 0) {
+        // UPDATE VARIABLES
+        percPriority = (*pqMaxHeapArray[percIdx]).GetPacketPriority();
+        parentIdx = floor((percIdx-1)/2);
         parentPriority = (*pqMaxHeapArray[parentIdx]).GetPacketPriority();
-    
-        if(parentPriority > percPriority || parentIdx == NULL) {
-            isDone = true;
-            break;
-        }
-        else {
-            // SWAP DATA
-            (*pqMaxHeapArray[percIdx]).InsertNodeData(parentIdx);
-            (*pqMaxHeapArray[parentIdx]).InsertNodeData(percIdx);
-            // SWAP LOCATIONS
-            temp = pqMaxHeapArray[parentIdx];
-            pqMaxHeapArray[parentIdx] = pqMaxHeapArray[percIdx];
-            pqMaxHeapArray[percIdx] = temp;
-            percIdx = parentIdx;
-        }  
+
+        // SWAP DATA
+        (*pqMaxHeapArray[percIdx]).InsertNodeData(parentIdx);
+        (*pqMaxHeapArray[parentIdx]).InsertNodeData(percIdx);
+        // SWAP LOCATIONS
+        temp = pqMaxHeapArray[parentIdx];
+        pqMaxHeapArray[parentIdx] = pqMaxHeapArray[percIdx];
+        pqMaxHeapArray[percIdx] = temp;
+        percIdx = parentIdx;
     }
     return;
 }
 
-// INDEX AND REMOVAL FUNCTIONS
+// $$$$$ INDEX AND REMOVAL FUNCTIONS $$$$$
 // 
 shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
     shared_ptr<MaxHeapPQ> indexedPQ;  // 
@@ -149,75 +147,78 @@ shared_ptr<DataPacket> HashMap::indexPqAndRetrievePacket(int domain_ID) {
     }
     returnPacket = (*indexedPQ).RemoveTopPriority();  // CALL RemoveTopPriority ON *indexedPQ
     packetCount--;  // HashMap packetCount DECREMENTS BY ONE.
+    // (*indexedPQ).MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
+    (*indexedPQ).pqTopPointer = (*indexedPQ).pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
     return returnPacket;
 }
 
 // 
 shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority() {
     shared_ptr<DataPacket> returnPacket;  // 
-    int lastIdx = nextIndex - 1;  // LAST OCCUPIED pqMaxHeapArray INDEX
+    int lastIdx = nextIndex-1;  // LAST OCCUPIED pqMaxHeapArray INDEX
 
-    // MAX PRIORITY IS AT INDEX 0
-    returnPacket = pqMaxHeapArray[0];  // COLLECT THE TOP POINTER
-    pqMaxHeapArray[0] = pqMaxHeapArray[lastIdx];  // SWAP TOP NODE WITH LAST NODE
-    (*pqMaxHeapArray[0]).InsertNodeData(0);  // UPDATE DATAPACKET MEMBER VARIABLES
-    pqMaxHeapArray[lastIdx] = nullptr;  // DELETE LAST INDEX
-    nodeCount--;  // 
-    nextIndex--;  // 
+    if(nodeCount == 0) { 
+        return NULL;
+    }
 
-    // MAINTAIN HEAP INVARIANTS
-    MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
-    pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
+    else {
+        returnPacket = pqMaxHeapArray[0];  // COLLECT THE TOP POINTER
+        pqMaxHeapArray[0] = pqMaxHeapArray[lastIdx];  // SWAP TOP NODE WITH LAST NODE
+        (*pqMaxHeapArray[0]).InsertNodeData(0);  // UPDATE DATAPACKET MEMBER VARIABLES
+        pqMaxHeapArray[lastIdx] = nullptr;  // DELETE LAST INDEX
+        nodeCount--;  // 
+        nextIndex--;  // 
+        MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
+    }
+    // MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
+    // pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
     return returnPacket;
 }
 
-// FIX ME!!!!
+// FIX ME: REPAIR BASE CASES FOR NEAR-EMTY ARRAYS
 void MaxHeapPQ::MaxHeapPercolateDown() {
-    int leftChildIdx;
-    int rightChildIdx;
-    int percNodePriority;
-    int leftChildPriority;
-    int rightChildPriority;
-    //
     shared_ptr<DataPacket> temp;
     int percIndex = 0;
-    bool done = false;  // DECLARE WHILE-LOOP SENTINEL VALUE
-    //
-    while(done != true) {
-        //
-        leftChildIdx = (*pqMaxHeapArray[percIndex]).GetLeftChildIndex();
-        rightChildIdx = (*pqMaxHeapArray[percIndex]).GetRightChildIndex();
-        //
-        percNodePriority = (*pqMaxHeapArray[percIndex]).GetPacketPriority();
-        leftChildPriority = (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority();
-        rightChildPriority = (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority();
-        //
-        if(leftChildPriority > percNodePriority && leftChildPriority > rightChildPriority) {  // SWAP LEFT CHILD AND PERCNODE
-            // SWAP DATA
-            (*pqMaxHeapArray[percIndex]).InsertNodeData(leftChildIdx);
-            (*pqMaxHeapArray[leftChildIdx]).InsertNodeData(percIndex);
-            // SWAP LOCATIONS
-            temp = pqMaxHeapArray[leftChildIdx];
-            pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
-            pqMaxHeapArray[percIndex] = temp;
-            percIndex = leftChildIdx;
-            break;
-        }
-        else if(rightChildPriority > percNodePriority && rightChildPriority > leftChildPriority) {  // SWAP RIGHT CHILD AND PERCNODE
-            // SWAP DATA
-            (*pqMaxHeapArray[percIndex]).InsertNodeData(rightChildIdx);
-            (*pqMaxHeapArray[rightChildIdx]).InsertNodeData(percIndex);
-            // SWAP LOCATIONS
-            temp = pqMaxHeapArray[rightChildIdx];
-            pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
-            pqMaxHeapArray[percIndex] = temp;
-            percIndex = rightChildIdx; 
-            break;
+    int leftChildIdx;
+    int rightChildIdx;
+
+    bool percDone = false;
+    while(percIndex < nodeCount && percDone==false && nodeCount > 1) {
+        leftChildIdx = (2*percIndex) + 1;
+        rightChildIdx = (2*percIndex) + 2;
+
+        if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority() || 
+        (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority()) {
+            // SWAP LEFT
+            if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority()) {
+                // SWAP DATA
+                (*pqMaxHeapArray[percIndex]).InsertNodeData(leftChildIdx);  // MOVING TO leftChildIdx
+                (*pqMaxHeapArray[leftChildIdx]).InsertNodeData(percIndex);  // MOVING TO percIndex
+                // SWAP LOCATIONS
+                temp = pqMaxHeapArray[leftChildIdx];
+                pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
+                pqMaxHeapArray[percIndex] = temp;
+                percIndex = leftChildIdx;
+                break;
+            }
+            // SWAP RIGHT
+            else if ((*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() > (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority()) {
+                // SWAP DATA
+                (*pqMaxHeapArray[percIndex]).InsertNodeData(rightChildIdx);
+                (*pqMaxHeapArray[rightChildIdx]).InsertNodeData(percIndex);
+                // SWAP LOCATIONS
+                temp = pqMaxHeapArray[rightChildIdx];
+                pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
+                pqMaxHeapArray[percIndex] = temp;
+                percIndex = rightChildIdx; 
+                break;
+            }
         }
         else {
-            done = true;
+            percDone = true;
         }
     }
+    return;
 }
 
 
@@ -238,10 +239,6 @@ void HashMap::FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector
         }
     }
 }
-
-
-
-
 
 
 
