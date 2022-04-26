@@ -144,25 +144,24 @@ for(int k=1; k<6; ++k) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
 cout << endl;
 
 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FOUR: EMPTY THE MAXHEAPS AND POPULATE THE ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-
-
+cout << "~~~~~~" << endl;
+// READ THE pqMaxHeapArray FOR shuffledHashMap
 cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of shuffledHashMap is: " << endl;
     map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // ITERATE THROUGH "table"
     for(it=shuffledHashMap.table.begin(); it!=shuffledHashMap.table.end(); it++) {
         if(it->first == 1) {
             for (int i=0; i < 8; ++i) {
                 shared_ptr<DataPacket> thing = (*it->second).pqMaxHeapArray[i];
-                cout << (*thing).GetPacketData() << " ";
+                cout << (*thing).GetPacketData() <<" ";
             }
             //assignedPQ = it->second;  // COLLECT POINTER TO ASSIGNED DOMAIN PQ
         }
     }
 cout << endl << endl;
 
-
-
+// READ THE pqMaxHeapArray FOR inOrderHashMap
 cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of inOrderHashMap is: " << endl;
     map<int, shared_ptr<MaxHeapPQ>>::iterator it1;  // ITERATE THROUGH "table"
     for(it1=inOrderHashMap.table.begin(); it1!=inOrderHashMap.table.end(); it1++) {
@@ -177,40 +176,40 @@ cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of inOrderHash
 cout << endl << endl;
 
 
-
-
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FOUR: EMPTY THE MAXHEAPS AND POPULATE THE ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
 vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED DATA
 
 // CALL indexPqAndRetrievePacket() ON "inOrderHashMap" AND "shuffledHashMap"; PLACE RETRIEVED POINTERS INTO THE ASSIGNED VECTORS
+cout << "~~~~~~" << endl;
+shared_ptr<DataPacket> checkShuffledPacket;
+cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of shuffledHashMap:" << endl;
+bool done1 = false;
+while(done1 != true) {
+    checkShuffledPacket = shuffledHashMap.indexPqAndRetrievePacket(1);
+    if(checkShuffledPacket != NULL) {
+    cout << (*checkShuffledPacket).GetPacketData() << "  ";
+    }
+    else {
+        done1 = true;
+    }
+}
+cout << endl << endl;
 
-shared_ptr<DataPacket> checkPacket;
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
 
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
+shared_ptr<DataPacket> checkInOrderPacket;
+cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of inOrderHashMap:" << endl;
+bool done = false;
+while(done != true) {
+    checkInOrderPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+    if(checkInOrderPacket != NULL) {
+    cout << (*checkInOrderPacket).GetPacketData() << "  ";
+    }
+    else {
+        done = true;
+    }
+}
+cout << endl << endl;
 
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
-
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
-
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
-
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
-
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
-
-checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-cout << (*checkPacket).GetPacketData() << endl;
 
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FIVE: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
