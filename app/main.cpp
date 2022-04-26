@@ -20,41 +20,24 @@ using namespace std;
 
 int main(){
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE ONE: CREATE DATAPACKET OBJECTS AND LOAD SHARED POINTERS INTO STACKS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE ONE: CREATE DATAPACKET OBJECTS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     std::array<int,50> packetPriority;  // ARRAY CONTAINING PACKET PRIORITIES
     std::array<string,50> packetData;  // ARRAY CONTAINING PACKET DATA
-    std::array<int,50> packetDomainID;  // ARRAY CONTAINING PACKET DOMAIN_IDs
+    // packetDomainID ARRAY DOMAIN_ID FREQUENCIES: [8, 12, 9, 7, 14] (FOR DOMAIN 1,2,3... ETC.)
+    std::array<int,50> packetDomainID = {1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
 
 // LOAD EACH ARRAY WITH DATA
-for(int i=0; i<packetPriority.size(); ++i) {
-    int j;
-    if(i<14) {          // 0-13
-        j = i;
-        // packetDomainID[i] = "uxui_interface"; }
-        packetDomainID[i] = 1; }
-    else if(i<21) {     // 14-20
-        j = (i-13);
-        // packetDomainID[i] = "db_config"; }
-        packetDomainID[i] = 2; }
-    else if(i<36) {     // 21-35
-        j = (i-20);
-        // packetDomainID[i] = "launch_files"; }
-        packetDomainID[i] = 3; }
-    else if(i<41) {     // 36-40
-        j = (i-35);
-        // packetDomainID[i] = "registration"; }
-        packetDomainID[i] = 4; }
-    else {              // 41-50
-        j = (i-40);
-        // packetDomainID[i] = "exec_files"; }
-        packetDomainID[i] = 5; }
-
-    packetPriority[i] = j;
-    packetData[i] = to_string(i+1);
+for(int i=0; i<packetPriority.size(); ++i) {  // NUMBERED 0-50
+    packetPriority[i] = i+1;
+}
+for(int i=0; i<packetData.size(); ++i) {  // NUMBERED 0-50
+    packetData[i] = to_string(i+1);  // CONTAINS A STRING VALUE OF THE PRIORITY
 }
 
 
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE TWO:LOAD SHARED POINTERS INTO STACKS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 // CREATE AN IN-ORDER DATAPACKET STACK CALLED "inOrderStack"
 std::stack<shared_ptr<DataPacket>> inOrderStack;  // STACK TO HOLD IN-ORDER FEED
@@ -108,9 +91,9 @@ cout << endl << "  Shuffled stack size: " << shuffledStack.size() << endl << end
 
 
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE TWO: CREATE "IN-ORDER" AND "SHUFFLED" HASHMAP OBJECTS AND INSERT DATAPACKETS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE THREE: CREATE "IN-ORDER" AND "SHUFFLED" HASHMAP OBJECTS AND INSERT THE DATAPACKETS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-// IN-ORDER HASHMAP OBJECT:
+// INITIATE AND LOAD IN-ORDER HASHMAP:
 cout << "~~~~~~" << endl << "Creating In-Order MaxHeapHashMap object..." << endl;
 HashMap inOrderHashMap;  // DECLARE IN-ORDER HASHMAP OBJECT
 inOrderHashMap.initHashMap();  // INITIATE IN-ORDER HASHMAP OBJECT
@@ -128,7 +111,7 @@ while(!inOrderStack.empty()) {  // INSERT THE DATA PACKETS FROM inOrderStack INT
     inOrderHashMap.assignPqDomainAndInsert(curPacket);  // INSERT THE PACKET INTO inOrderHashMap
 }
 cout << endl;
-cout << inOrderHashMap.packetCount << " pre-sorted DataPackets were successfully routed and inserted in the inOrderHashMap MaxHeapHashMap data structure." << endl;
+cout << inOrderHashMap.packetCount << " sorted DataPackets were successfully routed and inserted in the inOrderHashMap MaxHeapHashMap data structure." << endl;
 for(int j=1; j<6; ++j) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
     cout << "  " << (*inOrderHashMap.table[j]).nodeCount << " objects in the " << (*inOrderHashMap.table[j]).domain << " domain." << endl;
 }
@@ -136,7 +119,7 @@ cout << endl;
 
 
 
-// SHUFFLED HASHMAP OBJECT:
+// INITIATE AND LOAD SHUFFLED HASHMAP OBJECT:
 cout << "~~~~~~" << endl << "Creating Shuffled MaxHeapHashMap object..." << endl;
 HashMap shuffledHashMap;  // SHUFFLED HASHMAP OBJECT
 shuffledHashMap.initHashMap();  // INITIATE SHUFFLED HASHMAP OBJECT
@@ -164,7 +147,40 @@ cout << endl;
 
 
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP THREE: SCRIPT-GOVERNED TABLE INDEXING AND POPULATION OF ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of shuffledHashMap is: " << endl;
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // ITERATE THROUGH "table"
+    for(it=shuffledHashMap.table.begin(); it!=shuffledHashMap.table.end(); it++) {
+        if(it->first == 1) {
+            for (int i=0; i < 8; ++i) {
+                shared_ptr<DataPacket> thing = (*it->second).pqMaxHeapArray[i];
+                cout << (*thing).GetPacketData() << " ";
+            }
+            //assignedPQ = it->second;  // COLLECT POINTER TO ASSIGNED DOMAIN PQ
+        }
+    }
+cout << endl << endl;
+
+
+
+cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of inOrderHashMap is: " << endl;
+    map<int, shared_ptr<MaxHeapPQ>>::iterator it1;  // ITERATE THROUGH "table"
+    for(it1=inOrderHashMap.table.begin(); it1!=inOrderHashMap.table.end(); it1++) {
+        if(it1->first == 1) {
+            for (int i=0; i < 8; ++i) {
+                shared_ptr<DataPacket> thing = (*it1->second).pqMaxHeapArray[i];
+                cout << (*thing).GetPacketData() << " ";
+            }
+            //assignedPQ = it->second;  // COLLECT POINTER TO ASSIGNED DOMAIN PQ
+        }
+    }
+cout << endl << endl;
+
+
+
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FOUR: EMPTY THE MAXHEAPS AND POPULATE THE ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
 vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED DATA
@@ -172,19 +188,32 @@ vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED D
 // CALL indexPqAndRetrievePacket() ON "inOrderHashMap" AND "shuffledHashMap"; PLACE RETRIEVED POINTERS INTO THE ASSIGNED VECTORS
 
 shared_ptr<DataPacket> checkPacket;
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
 
-for(int i=0; i=13; ++i) {
-    checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-    cout << (*checkPacket).GetPacketData() << endl;
-}
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
+
+checkPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+cout << (*checkPacket).GetPacketData() << endl;
 
 
-
-
-
-
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STEP FOUR: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FIVE: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
