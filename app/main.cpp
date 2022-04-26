@@ -15,10 +15,11 @@
 #include <algorithm>
 
 using namespace std;
-// SEE PROGRAM PSUEDOCODE AND DEVELOPMENT INSTRUCTIONS ARE IN README.MD
 
 
 int main(){
+
+
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE ONE: CREATE DATAPACKET OBJECTS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -34,6 +35,8 @@ for(int i=0; i<packetPriority.size(); ++i) {  // NUMBERED 0-50
 for(int i=0; i<packetData.size(); ++i) {  // NUMBERED 0-50
     packetData[i] = to_string(i+1);  // CONTAINS A STRING VALUE OF THE PRIORITY
 }
+
+
 
 
 
@@ -144,6 +147,9 @@ for(int k=1; k<6; ++k) {  // DESCRIBE THE DISTRIBUTION ACCROSS DOMAINS
 cout << endl;
 
 
+
+
+
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FOUR: EMPTY THE MAXHEAPS AND POPULATE THE ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 cout << "~~~~~~" << endl;
@@ -173,50 +179,82 @@ cout << "The contents of the UXUI_INTERFACE domain pqMaxHeapArray of inOrderHash
             //assignedPQ = it->second;  // COLLECT POINTER TO ASSIGNED DOMAIN PQ
         }
     }
-cout << endl << endl;
+cout << endl;
 
+
+
+// // CALL indexPqAndRetrievePacket() ON "inOrderHashMap" AND "shuffledHashMap"; PLACE RETRIEVED POINTERS INTO THE ASSIGNED VECTORS
+// cout << "~~~~~~" << endl;
+// shared_ptr<DataPacket> checkShuffledPacket;
+// cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of shuffledHashMap:" << endl;
+// bool done1 = false;
+// while(done1 != true) {
+//     checkShuffledPacket = shuffledHashMap.indexPqAndRetrievePacket(1);
+//     if(checkShuffledPacket != NULL) {
+//     cout << (*checkShuffledPacket).GetPacketData() << "  ";
+//     }
+//     else {
+//         done1 = true;
+//     }
+// }
+// cout << endl << endl;
+
+
+// shared_ptr<DataPacket> checkInOrderPacket;
+// cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of inOrderHashMap:" << endl;
+// bool done = false;
+// while(done != true) {
+//     checkInOrderPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
+//     if(checkInOrderPacket != NULL) {
+//     cout << (*checkInOrderPacket).GetPacketData() << "  ";
+//     }
+//     else {
+//         done = true;
+//     }
+// }
+// cout << endl << endl;
+
+
+
+
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FIVE: ASSERT OR DENY THE EQVIVALENCE OF EACH ARRAY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 vector<shared_ptr<DataPacket>> InOrder_Result;  // RESULT VECTOR FOR IN-ORDER DATA
 vector<shared_ptr<DataPacket>> Shuffled_Result;  // RESULT VECTOR FOR SHUFFLED DATA
 
-// CALL indexPqAndRetrievePacket() ON "inOrderHashMap" AND "shuffledHashMap"; PLACE RETRIEVED POINTERS INTO THE ASSIGNED VECTORS
-cout << "~~~~~~" << endl;
-shared_ptr<DataPacket> checkShuffledPacket;
-cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of shuffledHashMap:" << endl;
-bool done1 = false;
-while(done1 != true) {
-    checkShuffledPacket = shuffledHashMap.indexPqAndRetrievePacket(1);
-    if(checkShuffledPacket != NULL) {
-    cout << (*checkShuffledPacket).GetPacketData() << "  ";
-    }
-    else {
-        done1 = true;
-    }
+// RETRIEVE THE shuffledHashMap DATAPACKETS FROM THE HASHMAP STRUCTURE
+Shuffled_Result = shuffledHashMap.FillDestinationVector();
+// PRINT OUT Shuffled_Result VECTOR SIZE AND CONTENTS:
+cout << endl << "Size of the Shuffled_Result vector is: ";
+cout << Shuffled_Result.size() << endl;
+
+for(int i=0; i < Shuffled_Result.size(); i++){
+   cout << (*Shuffled_Result[i]).GetPacketData() << " ";
+}
+cout << endl;
+
+
+// RETRIEVE THE inOrderHashMap DATAPACKETS FROM THE HASHMAP STRUCTURE:
+InOrder_Result = inOrderHashMap.FillDestinationVector();
+// PRINT OUT InOrder_Result VECTOR SIZE AND CONTENTS:
+cout << endl << "Size of the InOrder_Result vector is: ";
+cout << InOrder_Result.size() << endl;
+
+for(int i=0; i < InOrder_Result.size(); i++){
+   cout << (*InOrder_Result[i]).GetPacketData() << " ";
 }
 cout << endl << endl;
 
 
-shared_ptr<DataPacket> checkInOrderPacket;
-cout << "Verifying index and removal operations using the UXUI_INTERFACE domain of inOrderHashMap:" << endl;
-bool done = false;
-while(done != true) {
-    checkInOrderPacket = inOrderHashMap.indexPqAndRetrievePacket(1);
-    if(checkInOrderPacket != NULL) {
-    cout << (*checkInOrderPacket).GetPacketData() << "  ";
-    }
-    else {
-        done = true;
-    }
+//DELARE EQUIVALENCE/NON-EQUIVALENCE OF THE TWO VECTORS:
+cout << "~~~~~~" << endl << "RESULT: ";
+if(Shuffled_Result == InOrder_Result) {
+    cout << "THE VECTORS ARE EQUIVALENT AND MAXHEAPHASHMAP DATA STRUCTURE EXHIBITS SORTING CHARACTERISTICS!" << endl << endl;
 }
-cout << endl << endl;
-
-
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ STAGE FIVE: ASSERT EQVIVALENCE OF BOTH ARRAYS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-
-
+else {
+    cout << "MAX HEAP PROPERTIES ALONE ARE INSUFFICIENT TO ACHIEVE SORTING, FURTHER DEVELOPMENT IS NECESSARY..." << endl << endl;
+}
 
 
     return 0;
