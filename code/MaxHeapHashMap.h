@@ -34,7 +34,7 @@ struct MaxHeapPQ {  // Five MaxHeapPQ's are instantiated in every HashMap object
 
   // RETRIEVAL FUNCTIONS
   shared_ptr<DataPacket> RemoveTopPriority();  // 
-  void MaxHeapPercolateDown();  // 
+  void MaxHeapPercolateDown(int index);  // 
 };
 
 

@@ -160,7 +160,6 @@ shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority() {
     if(nodeCount == 0) { 
         return NULL;
     }
-
     else {
         returnPacket = pqMaxHeapArray[0];  // COLLECT THE TOP POINTER
         pqMaxHeapArray[0] = pqMaxHeapArray[lastIdx];  // SWAP TOP NODE WITH LAST NODE
@@ -168,76 +167,85 @@ shared_ptr<DataPacket> MaxHeapPQ::RemoveTopPriority() {
         pqMaxHeapArray[lastIdx] = nullptr;  // DELETE LAST INDEX
         nodeCount--;  // 
         nextIndex--;  // 
-        MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
+        MaxHeapPercolateDown(0);  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
     }
     // MaxHeapPercolateDown();  // CALL PERCOLATE DOWN ON CURRENT MaxHeapPQ
     // pqTopPointer = pqMaxHeapArray[0];  // REASSIGN pqTopPointer AFTER PERCOLATE DOWN
     return returnPacket;
 }
 
+
 // FIX ME: REPAIR BASE CASES FOR NEAR-EMTY ARRAYS
-void MaxHeapPQ::MaxHeapPercolateDown() {
+void MaxHeapPQ::MaxHeapPercolateDown(int index) {
     shared_ptr<DataPacket> temp;
-    int percIndex = 0;
-    int leftChildIdx;
-    int rightChildIdx;
+    int percIndex = 0;  //index;
+    int leftChildIdx = (2*percIndex)+1;
+    int rightChildIdx = (2*percIndex)+2;
 
-    bool percDone = false;
-    while(percIndex < nodeCount && percDone==false && nodeCount > 1) {
-        leftChildIdx = (2*percIndex) + 1;
-        rightChildIdx = (2*percIndex) + 2;
-
-        if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority() || 
-        (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority()) {
-            // SWAP LEFT
-            if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority()) {
-                // SWAP DATA
-                (*pqMaxHeapArray[percIndex]).InsertNodeData(leftChildIdx);  // MOVING TO leftChildIdx
-                (*pqMaxHeapArray[leftChildIdx]).InsertNodeData(percIndex);  // MOVING TO percIndex
-                // SWAP LOCATIONS
-                temp = pqMaxHeapArray[leftChildIdx];
-                pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
-                pqMaxHeapArray[percIndex] = temp;
-                percIndex = leftChildIdx;
-                break;
-            }
-            // SWAP RIGHT
-            else if ((*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() > (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority()) {
-                // SWAP DATA
-                (*pqMaxHeapArray[percIndex]).InsertNodeData(rightChildIdx);
-                (*pqMaxHeapArray[rightChildIdx]).InsertNodeData(percIndex);
-                // SWAP LOCATIONS
-                temp = pqMaxHeapArray[rightChildIdx];
-                pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
-                pqMaxHeapArray[percIndex] = temp;
-                percIndex = rightChildIdx; 
-                break;
-            }
-        }
-        else {
-            percDone = true;
-        }
+    if(nodeCount < 3) {
+        return;  // BASE CASE TAKEN CARE OF BY MaxHeapPQ::RemoveTopPriority()
     }
-    return;
+    else {
+        if(nodeCount == 4) {
+            shared_ptr<DataPacket> lastNode = pqMaxHeapArray[nodeCount-1];
+            MaxHeapPercolateUp(lastNode);  // PERCOLATE UP AT INDEX THREE, THEN COMPARE 0-2
+        }
+        bool percDone = false;
+        while(percIndex < nodeCount && percDone==false && nodeCount > 1) {  // FIX ME
+            leftChildIdx = (2*percIndex) + 1;
+            rightChildIdx = (2*percIndex) + 2;
+
+            if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority() || 
+            (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[percIndex]).GetPacketPriority()) {
+                // SWAP LEFT
+                if((*pqMaxHeapArray[leftChildIdx]).GetPacketPriority() >= (*pqMaxHeapArray[rightChildIdx]).GetPacketPriority()) {
+                    // SWAP DATA
+                    (*pqMaxHeapArray[percIndex]).InsertNodeData(leftChildIdx);  // 
+                    (*pqMaxHeapArray[leftChildIdx]).InsertNodeData(percIndex);  // 
+                    // SWAP LOCATIONS
+                    temp = pqMaxHeapArray[leftChildIdx];
+                    pqMaxHeapArray[leftChildIdx] = pqMaxHeapArray[percIndex];
+                    pqMaxHeapArray[percIndex] = temp;
+                    percIndex = leftChildIdx;
+                    break;
+                }
+                // SWAP RIGHT
+                else if ((*pqMaxHeapArray[rightChildIdx]).GetPacketPriority() > (*pqMaxHeapArray[leftChildIdx]).GetPacketPriority()) {
+                    // SWAP DATA
+                    (*pqMaxHeapArray[percIndex]).InsertNodeData(rightChildIdx);
+                    (*pqMaxHeapArray[rightChildIdx]).InsertNodeData(percIndex);
+                    // SWAP LOCATIONS
+                    temp = pqMaxHeapArray[rightChildIdx];
+                    pqMaxHeapArray[rightChildIdx] = pqMaxHeapArray[percIndex];
+                    pqMaxHeapArray[percIndex] = temp;
+                    percIndex = rightChildIdx; 
+                    break;
+                }
+            }
+            else {
+                percDone = true;
+            }
+        }
+        return;
+    }
 }
 
+    // EMPTY A HASHMAP OBJECT INTO A RECEIVING VECTOR
+    void HashMap::FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector) {
+        shared_ptr<DataPacket> curNode;
+        shared_ptr<MaxHeapPQ> currentDomain;
+        int domainNumber;
 
-// EMPTY A HASHMAP OBJECT INTO A RECEIVING VECTOR
-void HashMap::FillDestinationVector(vector<shared_ptr<DataPacket>> writeToVector) {
-    shared_ptr<DataPacket> curNode;
-    shared_ptr<MaxHeapPQ> currentDomain;
-    int domainNumber;
+        map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
+        for(it=table.begin(); it!=table.end(); it++) {
+            currentDomain = it->second;
+            domainNumber = it->first;
 
-    map<int, shared_ptr<MaxHeapPQ>>::iterator it;  // declare iterator for the map
-    for(it=table.begin(); it!=table.end(); it++) {
-        currentDomain = it->second;
-        domainNumber = it->first;
-
-        while((*currentDomain).nodeCount > 0) {
-            curNode = indexPqAndRetrievePacket(domainNumber);  // 
-            writeToVector.push_back(curNode);  // 
+            while((*currentDomain).nodeCount > 0) {
+                curNode = indexPqAndRetrievePacket(domainNumber);  // 
+                writeToVector.push_back(curNode);  // 
+            }
         }
-    }
 }
 
 
