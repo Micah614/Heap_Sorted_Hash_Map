@@ -1,36 +1,61 @@
-# EmptyProject
-An empty project for CSPB2270 final projects
-
-
+# MaxHeapHashMap
+Micah Simmerman
+CU CSPB 2270
+Spring 2022
+April 26, 2022
 <hr>
 
-### What is the purpose of this project?
-The purpose of the project is to give you a chance to find a new (to you) data structure and do something interesting with it. 
-There are several ways to go about doing this. You might begin to solve some problem and use that to guide a decision on which data structure is (in your view) the most appropriate. Another way to do it is to find an interesting data structure that you'd like to explore more and invent a use for it. Either way is OK. 
+DATA STRUCTURES AND ALGORITHMS- FINAL SEMESTER PROJECT
+TITLE: "Creating a Data Buffer System with Hash Addressing and Max-Heap Priority Queues"
 
-You must find a data structure for your project which is *different than the ones we have used in programming assignments*. There are many different extensions for the data structures covered in the course as well as many different data structures that we have not investigated in the course.
+PROJECT DATA STRUCTURE IMPLEMENTED:
+THE PURPOSE OF THIS PROJECT WAS TO DETERMINE IF MAX HEAP PRIORITY QUEUES COULD BE USED TO EFFECTIVELY ROUTE, STORE, AND SORT DATA PACKET OBJECTS AS PART OF A LARGER, 
+DATA BUFFER-LIKE PROGRAM. ALTHOUGH MUCH PROGRESS WAS MADE ON ALL THREE OF THESE ACCOUNTS, CERTAIN PROPERTIES OF MAX HEAP PRIORITY QUEUES EMERGED DURING THE PROJECT THAT 
+COMPLICATED THESE GOALS AND INDICATED POTENTIAL TRADE-OFFS IN THE PROGRAM'S DESIGN. THE ROUTING AND STORAGE OF DATA PACKET OBJECTS USING MAX HEAP PRIORITY QUEUES PROVED 
+HIGHLY EFFICIENT WHILE THE SORTING CHARACTERISTICS OF THESE PQ SUBSTRUCTURES LEFT SOMETHING TO BE DESIRED. ALTHOUGH THE PROJECT WAS INITIALLY PLANNED TO INVOLVE HASHING, 
+THIS ADDITIONAL LAYER OF COMPLEXITY WAS DETERMINED TO BE UNNECESSARY, AND WAS SUBSEQUENTLY REMOVED FROM THE PROJECT SCOPE. 
 
-### How much time will it take?
-You should plan to allocate about 30 hours between now and the end of the semester to building your project around the data structure that you have selected.
 
-### How will the project be evaluated?
-The proposal grade accounts for 30% of your overall project score. You should write at most a Two Page description of your proposal.  You can write it in a word processor and add a PDF version to your project repository or you can add a markdown file to your project repository and write the proposal in the markdown language you see here. 
+EXPLANATION OF THE DATA STRUCTURE:
+THIS PROGRAM IS A HYBRID DATA STRUCTURE CONTAINING FIVE MAX HEAP PRIORITY QUEUES, INSTANTIATED WITHIN AND CONTROLLED BY A "HASHMAP" PARENT DATA STRUCTURE. THE HASHMAP 
+PARENT DATA STRUCTURE CONTAINS A MAP-TYPE DATA CONTAINER CALLED "TABLE", THAT HOLDS INTEGER KEYS CORRESPONDING TO MAXHEAP SHARED POINTER VALUES, IN ADDITION TO SEVERAL DATA 
+MEMBERS AND FUNCTIONS THAT ARE CLASSIFIED INTO TWO DISTICT GROUPS: "ROUTING AND STORAGE" AND "INDEXING AND REMOVAL". 
 
-**Your proposal is going to be graded by your fellow students.**
+THE UNDERLYING PRIORITY QUEUES ARE OCCASIONALLY REFERRED TO AS "DOMAINS" THROUGHOUT THE ASSIGNMENT, THE KEYS THAT THEY ARE INDEXED BY ARE REPRESENTATIVE OF THESE DOMAINS 
+AND ARE USED TO ROUTE DATAPACKETS TO THEIR ASSIGNED PRIORITY QUEUE. DATA PACKET OBJECTS ARE THE SMALLEST OBJECTS IN THE PROGRAM AND ARE FREQUENTLY REFERED TO AND TREATED
+AS NODES THROUGHOUT THE PROGRAM. PERCOLATE UP AND PERCOLATE DOWN PRIORITY QUEUE ALGORITHMS ARE IMPLEMENTED THROUGHOUT THE ASSIGNMENT TO ORGANIZE THE UNDERLYING MAXHEAP 
+PRIORITY QUEUES. 
 
-The proposal grading will take the following into consideration:
-* is it clearly and coherently stating the problem that you're attempting to solve
-* have you defended your choice of data structure (e.g. why did you X and not use Y or Z instead?)
-* have you provided a description of your plan for implementing different parts of the code
-   * How many functions do you think your data structure should have? 
-   * What do each of the functions accomplish?
-   * How are you planning to implement each function? (what is the basic algorithm?)
-   * Do you need recursive functions?
-   *  . . .
-* have you provided a definition of what 'done' looks like for the project. 
-   * you might propose writing unit-tests similar to class homework. If you do then you should discuss how your tests are going to look.
-   * what test cases should the project be able to handle when project is completed?
 
-### Interview Grading
-You don't need to write anything after the project is done, we are going to grade your project over an interview grading meeting. 
-Interview grading schedules are going to be out during finals week.
+INSTRUCTIONS TO COMPILE AND RUN THE PROGRAM:
+1.) CLONE THE REPOSITORY FROM GITHUB
+2.) NAVIGATE TO THE BUILD FOLDER IN THE TERMINAL'S COMMAND LINE
+3.) RUN CMAKE COMMANDS TO CREATE THE EXECUTABLE FILES
+4.) RUN THE MAKE COMMAND TO COMPILE THE PROJECT
+5.) CLEAR THE SCREEN AND ENTER: "./run_app" TO RUN THE MAIN.CPP FILE
+
+THE SCRIPT IN THE MAIN.CPP FILE WILL EXECUTE THE COMMANDS FOR THE PROJECT. YOU MAY FOLLOW ALONG BY READING THE MAIN.CPP FILE AND READING THE TERMINAL PRINT STATEMENTS. 
+THIS PROGRAM REPOSITORY CONTAINS TWO CPP FILES AND TWO HEADER FILES, ALL KEPT IN THE "code" FOLDER. DATAPACKET OBJECTS AND MEMBER FUNCTIONS ARE KEPT IN "DataPacket.h" AND 
+"DataPacket.cpp", WHILE THE MAXHEAPPQ AND HASHMAP DECLARATIONS AND DEFINITIONS ARE KEPT IN "MaxHeapHashMap.h" AND "MaxHeapHashMap.cpp" FILES RESPECTIVELY. 
+
+
+PLEASE ENJOY THE PROJECT.
+THANK YOU. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
