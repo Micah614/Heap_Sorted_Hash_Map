@@ -9,7 +9,7 @@ This hybrid data structure contains five max heap priority queues that are contr
 
 Data packets are developed using object-oriented design principles and contain class member data and functions that define the basic node structure of the BSTs. These nodes are collected from a combined list of such objects. The packets are then sorted and inserted into the appropriate priority queue by referencing the routing table. A separate script is used to remove each node from its’ assigned priority queue individually, to assess the performance of the hybrid data structure. 
 
-<strong>Discussion<strong><br>
+<strong>Discussion</strong><br>
 The design works exceptionally well for packet sorting but suffers certain performance issues associated with removing the final (c.a., 3) nodes from the queue. Percolate up and percolate down priority queue algorithms are implemented throughout the assignment to organize the underlying maxheap based priority queues. However, it is impossible to know if the BST remains balanced at the end of the packet collection. 
 
   <strong>Instructions to compile and run the program:</strong><br>
