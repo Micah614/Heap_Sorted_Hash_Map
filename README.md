@@ -1,7 +1,7 @@
-Purpose:
+Purpose:<br>
 The purpose of this project is to determine if multiple max heap priority queue structures can simultaneously route, sort, store, and retrieve a jumbled list containing domain labeled of nodes (data packets).
 
-Abstract
+Abstract<br>
 The routing and storage of data packet objects using max heap priority queues proved highly efficient in terms of packet sorting but emptying the static BST arrays without provoking a segmentation fault proved more challenging. This problem is easily resolved using a try-except when probing the second and third layers of an unbalanced BST. Heapifying these structures using either bubble-up or bubble down improves the issue but does not resolve it.  
 
 Description
