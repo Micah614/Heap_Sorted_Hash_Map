@@ -1,61 +1,28 @@
-# MaxHeapHashMap
-Micah Simmerman
-CU CSPB 2270
-Spring 2022
-April 26, 2022
-<hr>
+Purpose:
+The purpose of this project is to determine if multiple max heap priority queue structures can simultaneously route, sort, store, and retrieve a jumbled list containing domain labeled of nodes (data packets).
 
-DATA STRUCTURES AND ALGORITHMS- FINAL SEMESTER PROJECT
-TITLE: "Creating a Data Buffer System with Hash Addressing and Max-Heap Priority Queues"
+Abstract
+The routing and storage of data packet objects using max heap priority queues proved highly efficient in terms of packet sorting but emptying the static BST arrays without provoking a segmentation fault proved more challenging. This problem is easily resolved using a try-except when probing the second and third layers of an unbalanced BST. Heapifying these structures using either bubble-up or bubble down improves the issue but does not resolve it.  
 
-PROJECT DATA STRUCTURE IMPLEMENTED:
-THE PURPOSE OF THIS PROJECT WAS TO DETERMINE IF MAX HEAP PRIORITY QUEUES COULD BE USED TO EFFECTIVELY ROUTE, STORE, AND SORT DATA PACKET OBJECTS AS PART OF A LARGER, 
-DATA BUFFER-LIKE PROGRAM. ALTHOUGH MUCH PROGRESS WAS MADE ON ALL THREE OF THESE ACCOUNTS, CERTAIN PROPERTIES OF MAX HEAP PRIORITY QUEUES EMERGED DURING THE PROJECT THAT 
-COMPLICATED THESE GOALS AND INDICATED POTENTIAL TRADE-OFFS IN THE PROGRAM'S DESIGN. THE ROUTING AND STORAGE OF DATA PACKET OBJECTS USING MAX HEAP PRIORITY QUEUES PROVED 
-HIGHLY EFFICIENT WHILE THE SORTING CHARACTERISTICS OF THESE PQ SUBSTRUCTURES LEFT SOMETHING TO BE DESIRED. ALTHOUGH THE PROJECT WAS INITIALLY PLANNED TO INVOLVE HASHING, 
-THIS ADDITIONAL LAYER OF COMPLEXITY WAS DETERMINED TO BE UNNECESSARY, AND WAS SUBSEQUENTLY REMOVED FROM THE PROJECT SCOPE. 
+Description
+This hybrid data structure contains five max heap priority queues that are controlled by a central key index routing table [an index dictionary]. The table contains integer keys that represent the domain of each data packet, the shared pointer value is the address of the object’s assigned queue. This table also contains data members and class functions belonging to two semantic categories: "routing and storage" and "indexing and removal". 
 
+Data packets are developed using object-oriented design principles and contain class member data and functions that define the basic node structure of the BSTs. These nodes are collected from a combined list of such objects. The packets are then sorted and inserted into the appropriate priority queue by referencing the routing table. A separate script is used to remove each node from its’ assigned priority queue individually, to assess the performance of the hybrid data structure. 
 
-EXPLANATION OF THE DATA STRUCTURE:
-THIS PROGRAM IS A HYBRID DATA STRUCTURE CONTAINING FIVE MAX HEAP PRIORITY QUEUES, INSTANTIATED WITHIN AND CONTROLLED BY A "HASHMAP" PARENT DATA STRUCTURE. THE HASHMAP 
-PARENT DATA STRUCTURE CONTAINS A MAP-TYPE DATA CONTAINER CALLED "TABLE", THAT HOLDS INTEGER KEYS CORRESPONDING TO MAXHEAP SHARED POINTER VALUES, IN ADDITION TO SEVERAL DATA 
-MEMBERS AND FUNCTIONS THAT ARE CLASSIFIED INTO TWO DISTICT GROUPS: "ROUTING AND STORAGE" AND "INDEXING AND REMOVAL". 
+Discussion
+The design works exceptionally well for packet sorting but suffers certain performance issues associated with removing the final (c.a., 3) nodes from the queue. Percolate up and percolate down priority queue algorithms are implemented throughout the assignment to organize the underlying maxheap based priority queues. However, it is impossible to know if the BST remains balanced at the end of the packet collection. 
 
-THE UNDERLYING PRIORITY QUEUES ARE OCCASIONALLY REFERRED TO AS "DOMAINS" THROUGHOUT THE ASSIGNMENT, THE KEYS THAT THEY ARE INDEXED BY ARE REPRESENTATIVE OF THESE DOMAINS 
-AND ARE USED TO ROUTE DATAPACKETS TO THEIR ASSIGNED PRIORITY QUEUE. DATA PACKET OBJECTS ARE THE SMALLEST OBJECTS IN THE PROGRAM AND ARE FREQUENTLY REFERED TO AND TREATED
-AS NODES THROUGHOUT THE PROGRAM. PERCOLATE UP AND PERCOLATE DOWN PRIORITY QUEUE ALGORITHMS ARE IMPLEMENTED THROUGHOUT THE ASSIGNMENT TO ORGANIZE THE UNDERLYING MAXHEAP 
-PRIORITY QUEUES. 
+Instructions to compile and run the program:
+1.) Clone the repository from github
+2.) Navigate to the build folder in the terminal's command line
+3.) Run cmake commands to create the executable files
+4.) Run the make command to compile the project
+5.) Clear the screen and enter: "./run_app" to run the main.cpp file
+
+The script in the main.cpp file will execute the commands for the project. You may follow along by reading the main.cpp file and reading the terminal print statements. 
+This program repository contains two cpp files and two header files, all kept in the "code" folder. Datapacket objects and member functions are kept in "datapacket.h" and 
+"datapacket.cpp", while the maxheappq and hashmap declarations and definitions are kept in "maxheaphashmap.h" and "maxheaphashmap.cpp" files respectively. 
 
 
-INSTRUCTIONS TO COMPILE AND RUN THE PROGRAM:
-1.) CLONE THE REPOSITORY FROM GITHUB
-2.) NAVIGATE TO THE BUILD FOLDER IN THE TERMINAL'S COMMAND LINE
-3.) RUN CMAKE COMMANDS TO CREATE THE EXECUTABLE FILES
-4.) RUN THE MAKE COMMAND TO COMPILE THE PROJECT
-5.) CLEAR THE SCREEN AND ENTER: "./run_app" TO RUN THE MAIN.CPP FILE
-
-THE SCRIPT IN THE MAIN.CPP FILE WILL EXECUTE THE COMMANDS FOR THE PROJECT. YOU MAY FOLLOW ALONG BY READING THE MAIN.CPP FILE AND READING THE TERMINAL PRINT STATEMENTS. 
-THIS PROGRAM REPOSITORY CONTAINS TWO CPP FILES AND TWO HEADER FILES, ALL KEPT IN THE "code" FOLDER. DATAPACKET OBJECTS AND MEMBER FUNCTIONS ARE KEPT IN "DataPacket.h" AND 
-"DataPacket.cpp", WHILE THE MAXHEAPPQ AND HASHMAP DECLARATIONS AND DEFINITIONS ARE KEPT IN "MaxHeapHashMap.h" AND "MaxHeapHashMap.cpp" FILES RESPECTIVELY. 
-
-
-PLEASE ENJOY THE PROJECT.
-THANK YOU. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Enjoy the project.
+Thank you.
